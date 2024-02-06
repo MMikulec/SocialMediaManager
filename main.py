@@ -5,7 +5,7 @@ import logging
 
 
 if logging.DEBUG:
-    logger.warning(f"Is running in DUBUG mode")
+    logger.warning(f"Is running in DEBUG mode")
 
 
 # Path to your Excel file

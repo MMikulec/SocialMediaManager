@@ -176,7 +176,7 @@ class SocialMediaBot(ABC):
             success (bool): Whether the action was successful.
             error (str, optional): Error message if the action failed.
         """
-        # Update the logs's context to include this post's ID
+        # Update the logs context to include this post's ID
         self.logs.update_context(post_id=post.post_id)
 
         if success:
