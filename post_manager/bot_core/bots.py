@@ -1,125 +1,20 @@
-# post_manager/posts.py
-
 import logging
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
-from typing import Tuple, Optional, Any
 
-from post_manager.logger_config import setup_bot_logs, ContextualLogger
-from logger_config import logger, console
-from functools import wraps
-
-LogType = Tuple[int, str, Any | None]
-
-
-def auto_log(func):
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        action = func.__name__
-        # Safely attempt to find a specific logging method or use log_action as a fallback
-        log_method = getattr(self, f"log_{action}", self.log_action)
-        # Initialize result in case it's referenced before being assigned
-        result = None
-
-        try:
-            result = func(self, *args, **kwargs)
-            level = logging.INFO
-            message = f"Function {action} without message"
-            data = None
-
-            if isinstance(result, tuple):
-                level, message = result[:2]
-                data = result[2] if len(result) > 2 else None
-
-            # Prepare logging arguments
-            log_kwargs = {'level': level, 'message': message, 'data': data, **kwargs}
-
-            # Check if log_method is callable to avoid 'not callable' warning
-            if callable(log_method):
-                # Combine args and kwargs for the original function with log_kwargs
-                log_method(*args, **log_kwargs)
-            else:
-                # If log_method is somehow not callable, log a warning or error
-                self.logs.warning(f"Log method for action '{action}' is not callable.")
-
-        except Exception as e:
-            # Handle exceptions by logging them at the ERROR level
-            if callable(self.log_action):
-                self.log_action(level=logging.ERROR, message=f"Exception in '{action}': {str(e)}", data=None)
-            else:
-                # This is a fallback safety net and should ideally never be reached
-                logger.critical(f"Critical: log_action method not callable. Exception in '{action}': {str(e)}")
-
-        return result
-
-    return wrapper
+from post_manager.bot_core import LogType
+from post_manager.bot_core.auth import AuthManager
+from post_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger
+from post_manager.bot_core.posts import SocialMediaPost
+from post_manager.bot_core.singleton import SingletonMeta
 
 
-@dataclass
-class SocialMediaPost:
-    """
-    Represents a post to be shared on social media platforms.
-
-    Attributes:
-        post_id (int): Unique identifier for the post, typically sourced from an Excel file.
-        content (str): The text content of the social media post.
-        image_path (str): File path to an image associated with the post, if any.
-        hashtags (str): A string of hashtags to include in the post.
-    """
-    post_id: int  # Unique identifier for the post from Excel
-    content: str
-    image_path: str
-    hashtags: str
-
-
-class SingletonMeta(type(ABC)):
-    """
-    A metaclass for creating Singleton instances. Ensures that only one instance
-    of a class is created within the application context.
-    """
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            # Use 'super()' to call __call__ on the base type of ABC,
-            # which bypasses ABC's checks and allows instantiation.
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class AuthManager(ABC, metaclass=SingletonMeta):
-    """
-    Abstract base class for authentication management with social media APIs.
-
-    Attributes:
-        api_key (str): API key for the social media platform.
-        api_secret (str): API secret for secure authentication.
-        token (str): Authenticated token obtained after login.
-    """
-
-    def __init__(self, api_key, api_secret):
-        self.api_key = api_key
-        self.api_secret = api_secret
-        self.token = None
-
-    @abstractmethod
-    def login(self):
-        """Performs the login operation to authenticate with the social media platform."""
-        pass
-
-    @abstractmethod
-    def refresh_token(self):
-        """Refreshes the authentication token if it has expired or needs renewal."""
-        pass
-
-
-class SocialMediaBot(ABC):
+class SocialMediaBot(ABC, metaclass=SingletonMeta):
     """
     Abstract base class for social media bots responsible for posting content.
 
     Attributes:
         logs (ContextualLogger): Logger for recording bot activities, configured per bot instance.
-        auth_manager (AuthManager): Authentication manager instance for handling API authentication.
+        auth_manager (post_manager.bot_core.auth.AuthManager): Authentication manager instance for handling API authentication.
     """
 
     def __init__(self, excel_file_name):
@@ -133,6 +28,7 @@ class SocialMediaBot(ABC):
         self.logs = ContextualLogger(base_logger,
                                      {'excel_file': excel_file_name, 'platform_name': self.platform_name})
         self.auth_manager = self.create_auth_manager(api_key="your_api_key", api_secret="your_api_secret")
+        self.excel_file_name = excel_file_name
 
     @property
     @abstractmethod

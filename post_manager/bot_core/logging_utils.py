@@ -1,9 +1,9 @@
 import logging
 import os
-from typing import Any, Dict
+from typing import Dict, Any
 
-from logger_config import logger
 from config import LOGGING_CONFIG
+from logger_config import logger
 
 
 def setup_bot_logs(excel_file_name):

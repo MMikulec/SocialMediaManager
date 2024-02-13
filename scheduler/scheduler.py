@@ -4,7 +4,7 @@ import pandas as pd
 from apscheduler.schedulers.background import BackgroundScheduler
 from openpyxl.reader.excel import load_workbook
 
-from post_manager.posts import SocialMediaPost
+from post_manager.bot_core.posts import SocialMediaPost
 from logger_config import logger, console
 from rich.table import Table
 from datetime import datetime
