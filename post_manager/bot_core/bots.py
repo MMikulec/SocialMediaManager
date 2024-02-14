@@ -1,11 +1,16 @@
 import logging
 from abc import ABC, abstractmethod
+from typing import Protocol
 
 from post_manager.bot_core import LogType
 from post_manager.bot_core.auth import AuthManager
 from post_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger
 from post_manager.bot_core.posts import SocialMediaPost
 from post_manager.bot_core.singleton import SingletonMeta
+
+
+class SocialMediaProtocol(Protocol):
+    def post(self, post: SocialMediaPost) -> LogType: ...
 
 
 class SocialMediaBot(ABC, metaclass=SingletonMeta):

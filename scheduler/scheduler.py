@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from openpyxl.reader.excel import load_workbook
 
 from post_manager.bot_core.posts import SocialMediaPost
+from post_manager.bot_core.bots import SocialMediaProtocol
 from logger_config import logger, console
 from rich.table import Table
 from datetime import datetime
@@ -12,13 +13,38 @@ import importlib
 import os
 
 
-def display_dataframe_as_table(dataframe):
-    table = Table(show_header=True, header_style="bold magenta")
+def display_dataframe_as_table(dataframe, title):
+    """table = Table(show_header=True, header_style="bold magenta", title=f"[bold]{title}[/bold]")
     for column in dataframe.columns:
         table.add_column(column)
 
     for _, row in dataframe.iterrows():
         table.add_row(*[str(row[column]) for column in dataframe.columns])
+
+    console.print(table)"""
+    table = Table(show_header=True, header_style="bold magenta", title=f"[bold]{title}[/bold]")
+    for column in dataframe.columns:
+        table.add_column(column)
+
+    today = datetime.now().date()
+    for _, row in dataframe.iterrows():
+        # Initialize a list to store each cell's content with style
+        styled_row = []
+        row_is_today = pd.to_datetime(row['Scheduled Time']).date() == today
+        row_is_successful = row['Status'] == "Successful"
+
+        for column in dataframe.columns:
+            cell_text = str(row[column])
+            # Apply green color if the row is successful
+            if row_is_successful:
+                cell_text = f"[green]{cell_text}[/green]"
+            # If the scheduled time is today and it's not successful, apply yellow color
+            elif row_is_today and not row_is_successful:
+                cell_text = f"{cell_text}"
+            styled_row.append(cell_text)
+
+        # Add the styled row to the table
+        table.add_row(*styled_row)
 
     console.print(table)
 
@@ -91,7 +117,7 @@ class ExcelScheduler:
         today_posts = self.df[(self.df['Scheduled Time'].dt.date == current_date) & (self.df['Status'] == 'Scheduled')]
 
         # Display the filtered DataFrame as a table
-        display_dataframe_as_table(today_posts)
+        display_dataframe_as_table(today_posts, title="Today's scheduled posts")
 
         # Schedule posts based on the data from Excel file
         for _, row in today_posts.iterrows():
@@ -100,6 +126,16 @@ class ExcelScheduler:
             self.scheduler.add_job(lambda current_row=row: self.post_content(current_row),
                                    'date',
                                    run_date=post_time)
+
+    def update_post_status(self, post_id, new_status):
+        """
+        Updates the 'Status' column in the DataFrame for the row with the given post_id.
+        :param post_id: The unique identifier of the post.
+        :param new_status: The new status to set for the post.
+        """
+        # Find the row with the matching post_id and update the 'Status' column.
+        self.df.loc[self.df['Post ID'] == post_id, 'Status'] = new_status
+        # Depending on your setup, you might need to handle the actual saving to the file or database here.
 
     def load_platform_post_classes(self):
         """
@@ -137,7 +173,12 @@ class ExcelScheduler:
             logger.info(f"Loaded class {class_name} from post_manager.bots.{platform_name}")
 
             bot_class = getattr(module, class_name)
-            return bot_class(self.excel_file)  # Pass the Excel file name to the bot constructor
+            # return bot_class(self.excel_file)  # Pass the Excel file name to the bot constructor
+
+            # Instantiate the bot class. Assuming it takes an Excel file name in its constructor
+            bot_instance: SocialMediaProtocol = bot_class(self.excel_file)  # Type hint here
+
+            return bot_instance
         except (ImportError, AttributeError) as e:
             logger.error(f"Error loading bot for platform {platform_name}: {e}")
             return None
@@ -165,9 +206,25 @@ class ExcelScheduler:
                               hashtags=row['Hashtags'])
 
             # Call the post method of the bot with the post instance
-            bot.post(post)
+            if bot.post(post)[2]:
+                self.update_post_status(row['Post ID'], "Successful")
 
-            # TODO: 4. 2. 2024: Display post in table
+                # TODO: 4. 2. 2024: Display post in table
+                # Convert the row (Series) to DataFrame for display
+
+                updated_row = self.df.loc[self.df['Post ID'] == row['Post ID']]
+                updated_row_df = pd.DataFrame(updated_row)
+                # display_dataframe_as_table(updated_row_df, "Post Update")
+
+                # Get current date
+                current_date = datetime.now().date()
+                # Filter posts scheduled for the next day
+                today_posts = self.df[(self.df['Scheduled Time'].dt.date == current_date)]
+                # Display the filtered DataFrame as a table
+                display_dataframe_as_table(today_posts, title="Today's scheduled posts")
+
+                # Call additional functions as necessary, for example, to save changes to the DataFrame.
+
             # TODO: Marek: Change dataframe if is successfully posted
             # TODO: Marek: Call save_dataframe_changes_to_excel
         else:

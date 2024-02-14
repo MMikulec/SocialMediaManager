@@ -10,6 +10,10 @@ from post_manager.bot_core import LogType
 from logger_config import logger, console
 from dataclasses import dataclass
 
+import threading
+
+facebook_lock = threading.Lock()
+
 
 @dataclass
 class FacebookPost(SocialMediaPost):
@@ -36,5 +40,7 @@ class FacebookBot(SocialMediaBot):
 
     @auto_log
     def post(self, post: FacebookPost) -> LogType:
-        # return True or false
-        return logging.DEBUG, "message", True
+        with facebook_lock:
+            print("Facebook post lock")
+            # return True or false
+            return logging.DEBUG, "message", True
