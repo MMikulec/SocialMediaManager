@@ -4,7 +4,7 @@ from typing import Protocol
 
 from post_manager.bot_core import LogType
 from post_manager.bot_core.auth import AuthManager
-from post_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger
+from post_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger, LoggerSingleton
 from post_manager.bot_core.posts import SocialMediaPost
 from post_manager.bot_core.singleton import SingletonMeta
 
@@ -29,9 +29,10 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
         Args:
             excel_file_name (str): The name of the Excel file used for sourcing post data.
         """
-        base_logger = setup_bot_logs(excel_file_name)
+        """base_logger = setup_bot_logs(excel_file_name)
         self.logs = ContextualLogger(base_logger,
-                                     {'excel_file': excel_file_name, 'platform_name': self.platform_name})
+                                     {'excel_file': excel_file_name, 'platform_name': self.platform_name})"""
+        self.logs = LoggerSingleton.get_logger(excel_file_name, self.platform_name)
         self.auth_manager = self.create_auth_manager(api_key="your_api_key", api_secret="your_api_secret")
         self.excel_file_name = excel_file_name
 

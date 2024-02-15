@@ -2,6 +2,10 @@ import logging
 from functools import wraps
 
 from logger_config import logger
+import threading
+
+# Create a global lock for logging
+logging_lock = threading.Lock()
 
 
 def auto_log(func):
@@ -26,21 +30,25 @@ def auto_log(func):
             # Prepare logging arguments
             log_kwargs = {'level': level, 'message': message, 'data': data, **kwargs}
 
-            # Check if log_method is callable to avoid 'not callable' warning
-            if callable(log_method):
-                # Combine args and kwargs for the original function with log_kwargs
-                log_method(*args, **log_kwargs)
-            else:
-                # If log_method is somehow not callable, log a warning or error
-                self.logs.warning(f"Log method for action '{action}' is not callable.")
+            # Acquire the logging lock before performing any logging action
+            with logging_lock:
+                # Check if log_method is callable to avoid 'not callable' warning
+                if callable(log_method):
+                    # Combine args and kwargs for the original function with log_kwargs
+                    log_method(*args, **log_kwargs)
+                else:
+                    # If log_method is somehow not callable, log a warning or error
+                    self.logs.warning(f"Log method for action '{action}' is not callable.")
 
         except Exception as e:
             # Handle exceptions by logging them at the ERROR level
-            if callable(self.log_action):
-                self.log_action(level=logging.ERROR, message=f"Exception in '{action}': {str(e)}", data=None)
-            else:
-                # This is a fallback safety net and should ideally never be reached
-                logger.critical(f"Critical: log_action method not callable. Exception in '{action}': {str(e)}")
+            # Acquire the logging lock before performing any logging action
+            with logging_lock:
+                if callable(self.log_action):
+                    self.log_action(level=logging.ERROR, message=f"Exception in '{action}': {str(e)}", data=None)
+                else:
+                    # This is a fallback safety net and should ideally never be reached
+                    logger.critical(f"Critical: log_action method not callable. Exception in '{action}': {str(e)}")
 
         return result
 

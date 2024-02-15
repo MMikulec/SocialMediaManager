@@ -221,7 +221,7 @@ class ExcelScheduler:
                 # Filter posts scheduled for the next day
                 today_posts = self.df[(self.df['Scheduled Time'].dt.date == current_date)]
                 # Display the filtered DataFrame as a table
-                display_dataframe_as_table(today_posts, title="Today's scheduled posts")
+                display_dataframe_as_table(today_posts, title="Updated posts")
 
                 # Call additional functions as necessary, for example, to save changes to the DataFrame.
 

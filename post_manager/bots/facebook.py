@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import Tuple, Optional, Any, TypeAlias
 
 from post_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger
@@ -11,8 +12,9 @@ from logger_config import logger, console
 from dataclasses import dataclass
 
 import threading
+import time
 
-facebook_lock = threading.Lock()
+request_lock = threading.Lock()
 
 
 @dataclass
@@ -40,7 +42,12 @@ class FacebookBot(SocialMediaBot):
 
     @auto_log
     def post(self, post: FacebookPost) -> LogType:
-        with facebook_lock:
-            print("Facebook post lock")
-            # return True or false
-            return logging.DEBUG, "message", True
+        with request_lock:
+            # Simulate the request operation
+            print(f"Posting {post}...")
+            # Simulated delay or network operation
+            time.sleep(random.uniform(0.1, 0.3))
+            # This is where you would include your request code
+            # For demonstration, we assume it's successful
+        # The return value will be picked up by the auto_log decorator
+        return logging.DEBUG, "message", True

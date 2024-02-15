@@ -88,3 +88,18 @@ class ContextualLogger(logging.LoggerAdapter):
             **kwargs: Arbitrary keyword arguments to add to or update the logging context.
         """
         self.extra.update(kwargs)
+
+
+# TODO: Marek: Create singleton class for logs
+class LoggerSingleton:
+    _instances = {}
+
+    @classmethod
+    def get_logger(cls, excel_file_name, platform_name):
+        key = (excel_file_name, platform_name)
+        if key not in cls._instances:
+            base_logger = setup_bot_logs(excel_file_name)
+            contextual_logger = ContextualLogger(base_logger,
+                                                 {'excel_file': excel_file_name, 'platform_name': platform_name})
+            cls._instances[key] = contextual_logger
+        return cls._instances[key]
