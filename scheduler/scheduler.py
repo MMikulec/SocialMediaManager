@@ -9,19 +9,23 @@ from post_manager.bot_core.bots import SocialMediaProtocol
 from logger_config import logger, console
 from rich.table import Table
 from datetime import datetime
+
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+
 import importlib
 import os
 
 
+def my_listener(event):
+    if event.exception:
+        # Print with red color for failures
+        console.print(f'-----------------Job [red]{event.job_id} failed[/red]-----------------')
+    else:
+        # Print with green color for success
+        console.print(f'-----------------Job [green]{event.job_id} completed[/green]-----------------')
+
+
 def display_dataframe_as_table(dataframe, title):
-    """table = Table(show_header=True, header_style="bold magenta", title=f"[bold]{title}[/bold]")
-    for column in dataframe.columns:
-        table.add_column(column)
-
-    for _, row in dataframe.iterrows():
-        table.add_row(*[str(row[column]) for column in dataframe.columns])
-
-    console.print(table)"""
     table = Table(show_header=True, header_style="bold magenta", title=f"[bold]{title}[/bold]")
     for column in dataframe.columns:
         table.add_column(column)
@@ -61,6 +65,7 @@ class ExcelScheduler:
         self.df = None
         self.excel_file = excel_file
         self.scheduler = BackgroundScheduler()
+        self.scheduler.add_listener(my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
         # self.platform_post_classes = self.load_platform_post_classes()
 
     def start(self):
@@ -103,6 +108,7 @@ class ExcelScheduler:
         schedule posts every day at 01:00 AM.
         """
         # Schedule to read Excel file every day at 01:00 AM
+        logger.warning("-----------------------Schedule daily-----------------------")
         self.scheduler.add_job(self.load_data_and_schedule, 'cron', hour=1, minute=0)
         # TODO: 24. 1. 2024: Add schedule for update excel file
 
