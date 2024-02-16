@@ -68,43 +68,6 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
         """
         pass
 
-    def log_post_(self, post: SocialMediaPost, action: str, success: bool, error: str = ''):
-        """
-        Logs actions taken on a post, dynamically including the post's ID in the log message.
-
-        Args:
-            post (SocialMediaPost): The post object.
-            action (str): Description of the action being logged (e.g., 'Posting', 'Deleting').
-            success (bool): Whether the action was successful.
-            error (str, optional): Error message if the action failed.
-        """
-        # Update the logs context to include this post's ID
-        self.logs.update_context(post_id=post.post_id)
-
-        if success:
-            self.logs.info(f"{action} to {self.platform_name} succeeded.")
-        else:
-            self.logs.error(f"{action} to {self.platform_name} failed. Error: {error}")
-
-        # Optionally reset the post_id in the context if you don't want it to persist
-        self.logs.update_context(post_id=None)
-
-    def log_action_(self, action: str, *args, success: bool, error: str = ''):
-        """
-        Generic method for logging various actions.
-
-        Args:
-            action (str): The name of the action (typically the method name).
-            *args: Arguments passed to the action method (can be used to extract additional context).
-            success (bool): Whether the action was successful.
-            error (str, optional): Error message if the action failed.
-        """
-        # Example logging logic
-        if success:
-            self.logs.info(f"{action} succeeded.")
-        else:
-            self.logs.error(f"{action} failed. Error: {error}")
-
     def log_post(self, post: SocialMediaPost, level, message, data=None):
         """
         Logs actions related to a social media post, incorporating the post's ID into the logging context for

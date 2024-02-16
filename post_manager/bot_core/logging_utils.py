@@ -1,5 +1,7 @@
 import logging
 import os
+import threading
+
 from typing import Dict, Any
 
 from config import LOGGING_CONFIG
@@ -17,14 +19,26 @@ def setup_bot_logs(excel_file_name):
 
     logs = logging.getLogger(excel_base_name)
     logs.setLevel(LOGGING_CONFIG["bots_log_level"])
+    logs.propagate = False
 
     # Check if the logs already has handlers
     if not logs.handlers:
-        file_handler = logging.FileHandler(log_file)
+        """file_handler = logging.FileHandler(log_file)
         # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
+        logs.addHandler(file_handler)"""
+
+        file_handler = logging.FileHandler(log_file)
+        console_handler = logging.StreamHandler()  # For console output
+
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+        file_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)  # Using the same format for console output
+
         logs.addHandler(file_handler)
+        logs.addHandler(console_handler)  # Add console handler
 
     return logs
 
@@ -93,13 +107,14 @@ class ContextualLogger(logging.LoggerAdapter):
 # TODO: Marek: Create singleton class for logs
 class LoggerSingleton:
     _instances = {}
+    _lock = threading.Lock()  # Class-level lock
 
     @classmethod
     def get_logger(cls, excel_file_name, platform_name):
         key = (excel_file_name, platform_name)
-        if key not in cls._instances:
-            base_logger = setup_bot_logs(excel_file_name)
-            contextual_logger = ContextualLogger(base_logger,
-                                                 {'excel_file': excel_file_name, 'platform_name': platform_name})
-            cls._instances[key] = contextual_logger
-        return cls._instances[key]
+        with cls._lock:  # Ensure thread-safe access and creation of loggers
+            if key not in cls._instances:
+                base_logger = setup_bot_logs(excel_file_name)
+                contextual_logger = ContextualLogger(base_logger, {'excel_file': excel_file_name, 'platform_name': platform_name})
+                cls._instances[key] = contextual_logger
+            return cls._instances[key]
