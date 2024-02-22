@@ -1,35 +1,54 @@
-import os
+import re
 from datetime import datetime
+from pathlib import Path
 
 
 class LogDataManager:
-    def __init__(self, logs_directory: str):
-        self.logs_directory = logs_directory
+    def __init__(self, log_file_path: Path):
+        """
+        Initializes the LogDataManager with the path to the log file.
 
-    def read_log_entries(self, only_today: bool = False):
-        """Reads log entries, optionally filtering for today's entries."""
+        :param log_file_path: Path to the log file.
+        """
+        self.log_file_path = log_file_path
+
+    def read_logs(self, only_today=False):
+        """
+        Reads the log entries, optionally filtering for entries from today.
+
+        :param only_today: Whether to return only today's log entries.
+        :return: A list of dictionaries, each containing data from a log entry.
+        """
         log_entries = []
-        for log_file in os.listdir(self.logs_directory):
-            if log_file.endswith('.log'):
-                with open(os.path.join(self.logs_directory, log_file), 'r') as file:
-                    for line in file:
-                        if only_today and not self.is_entry_for_today(line):
-                            continue
-                        entry = self.parse_log_line(line)
-                        if entry:
-                            log_entries.append(entry)
+        today = datetime.now().date()
+        with open(self.log_file_path, 'r') as log_file:
+            for line in log_file:
+                if only_today:
+                    log_date = datetime.strptime(line.split()[0], '%Y-%m-%d').date()
+                    if log_date != today:
+                        continue
+                match = re.search(r'Post ID: (\d+) - (\w+)(?=\s-)', line)
+                if match:
+                    post_id, status = match.groups()
+                    log_entries.append({'post_id': int(post_id), 'status': status})
         return log_entries
 
-    def is_entry_for_today(self, line):
-        """Checks if a log entry line corresponds to the current date."""
-        log_date_str = line.split()[0]
-        try:
-            log_date = datetime.strptime(log_date_str, '%Y-%m-%d').date()
-            return log_date == datetime.now().date()
-        except ValueError:
-            return False
+    def update_df_from_logs(self, df, only_today=False):
+        """
+        Updates a DataFrame based on the log entries.
 
-    def parse_log_line(self, line):
-        """Parses a log line into a structured format."""
-        # Implement parsing logic based on your log format
-        return {'post_id': '...', 'status': '...'}
+        :param df: The DataFrame to update.
+        :param only_today: Whether to update the DataFrame based on only today's log entries.
+        :return: The updated DataFrame.
+        """
+        if df is None or df.empty:
+            return df  # Return the original DataFrame if it's None or empty
+
+        log_entries = self.read_logs(only_today=only_today)
+        for entry in log_entries:
+            # Assuming the DataFrame has columns 'Post ID' and 'Status'
+            # And the log entries dictionary has keys 'post_id' and 'status'
+            if entry['post_id'] in df['Post ID'].values:
+                df.loc[df['Post ID'] == entry['post_id'], 'Status'] = entry['status']
+
+        return df

@@ -1,12 +1,13 @@
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from .event_listener import my_listener
 
 
 class TaskScheduler:
-    def __init__(self, event_listener):
+    def __init__(self):
         self.scheduler = BackgroundScheduler()
-        self.scheduler.add_listener(event_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+        self.scheduler.add_listener(my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
     def schedule_daily_loading(self, job_function):
         """Schedules daily loading of data."""
