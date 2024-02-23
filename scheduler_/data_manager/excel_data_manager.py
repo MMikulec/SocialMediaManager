@@ -7,8 +7,11 @@ from openpyxl import load_workbook
 
 # Ensure the class documentation is descriptive
 class ExcelDataManager:
-    def __init__(self, excel_file_path: Path, sheet_name: str = 'Sheet1',
-                 id_column: str = 'Post ID', status_column: str = 'Status',
+    def __init__(self,
+                 excel_file_path: Path,
+                 sheet_name: str = 'Sheet1',
+                 id_column: str = 'Post ID',
+                 status_column: str = 'Status',
                  date_column: str = 'Scheduled Time'):
         """
         Initializes the ExcelDataManager with the specified Excel file path and configuration.
