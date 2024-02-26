@@ -1,6 +1,7 @@
 import time
 from pathlib import Path
 from logger_config import logger, console
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from scheduler import ExcelDataManager, LogDataManager, TaskScheduler, PostExecutor, BotManager, \
     display_dataframe_as_table
@@ -15,27 +16,25 @@ def main():
 
     # Update Excel with all available logs at start-up
     excel_manager.df = log_manager.update_df_from_logs(excel_manager.df, only_today=False)
+    display_dataframe_as_table(excel_manager.load_current_date_posts(), "Today's posts")
 
+    # Initialize the scheduler and configure tasks using the TaskScheduler class
+    excel_task_scheduler = TaskScheduler()
+
+    @excel_task_scheduler.job('cron', hour=23, minute=0, id='update_excel')
     def update_excel_from_logs():
         """Updates the Excel file with today's logs and saves changes."""
         excel_manager.df = log_manager.update_df_from_logs(excel_manager.df, only_today=True)
         excel_manager.save_changes_to_excel()
 
+    @excel_task_scheduler.job('cron', hour=1, minute=0, id='load_excel')
     def load_excel():
         """Loads today's posts from Excel and displays them."""
         excel_manager.load_excel_data()
         display_dataframe_as_table(excel_manager.load_current_date_posts(), "Today's posts")
 
-    # Initialize the scheduler and configure tasks
-    excel_task_scheduler = TaskScheduler()
-    excel_task_scheduler.schedule_daily_loading(update_excel_from_logs, hour=23, minute=0)
-    # Assuming you want to load and display today's posts at a specific time, default at 01:00
-    excel_task_scheduler.schedule_daily_loading(load_excel)
     excel_task_scheduler.start()
     excel_task_scheduler.list_scheduled_jobs()
-
-
-    #posts_task_scheduler = TaskScheduler()
 
 
 if __name__ == "__main__":
