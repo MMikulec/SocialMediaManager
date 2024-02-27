@@ -1,19 +1,43 @@
+import os
 import importlib
+from typing import Dict, Type, Optional
+from pathlib import Path
+from post_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Import the protocol and post class
+from logger_config import logger, console
 
 
 class BotManager:
-    def __init__(self, bots_directory: str):
-        self.bots_directory = bots_directory
+    def __init__(self, excel_file_name: str):
+        self.excel_file_name = excel_file_name
+        self.bot_instances: Dict[str, SocialMediaProtocol] = {}
+        self.platform_classes = self.load_platform_post_classes()
 
-    def load_bot(self, platform_name: str):
-        """Dynamically loads a bot based on the platform name."""
-        try:
-            # Assuming bot class names follow a consistent naming convention
-            class_name = platform_name.capitalize() + 'Bot'
-            module_path = f"{self.bots_directory}.{platform_name.lower()}"
-            module = importlib.import_module(module_path)
-            bot_class = getattr(module, class_name)
-            return bot_class()  # Instantiate the bot class
-        except (ImportError, AttributeError) as e:
-            # Handle error (e.g., log it, raise an exception)
-            pass
+    def load_platform_post_classes(self) -> Dict[str, Type[SocialMediaProtocol]]:
+        platform_classes = {}
+        # Assuming your bots.py file is in the correct location relative to this file
+        bots_dir = Path(__file__).parent.parent.parent / 'post_manager' / 'bots'
+        for file in bots_dir.iterdir():
+            if file.is_file() and file.suffix == '.py' and file.name != '__init__.py':
+                module_name = file.stem  # Extracts the file name without '.py'
+                module = importlib.import_module(f'post_manager.bots.{module_name}')
+                class_name = module_name.capitalize() + 'Bot'  # Construct the class name based on file name
+                bot_class = getattr(module, class_name, None)
+                if bot_class and issubclass(bot_class, SocialMediaProtocol):
+                    platform_classes[module_name.lower()] = bot_class
+        return platform_classes
+
+    def load_bot(self, platform_name: str) -> Optional[SocialMediaProtocol]:
+        platform_name = platform_name.lower()  # Normalize to lowercase
+        if platform_name not in self.bot_instances:
+            bot_class = self.platform_classes.get(platform_name)
+            if bot_class:
+                try:
+                    bot_instance = bot_class(self.excel_file_name)  # Instantiate the bot class
+                    self.bot_instances[platform_name] = bot_instance
+                    logger.info(f"Created new instance of {bot_class.__name__}.")
+                    return bot_instance
+                except Exception as e:
+                    logger.error(f"Error instantiating bot for platform {platform_name}: {e}")
+            else:
+                logger.error(f"No bot class found for platform: {platform_name}")
+        return self.bot_instances.get(platform_name)

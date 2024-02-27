@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from post_manager.bot_core import LogType
 from post_manager.bot_core.auth import AuthManager
@@ -9,7 +9,16 @@ from post_manager.bot_core.posts import SocialMediaPost
 from post_manager.bot_core.singleton import SingletonMeta
 
 
+@runtime_checkable
 class SocialMediaProtocol(Protocol):
+    """
+    A protocol for social media bots. Implementing classes are expected to accept
+    an 'excel_file_name' parameter in their constructor for initializing with a specific Excel file.
+    """
+
+    def __init__(self, excel_file_name: str):
+        self.excel_file_name = excel_file_name
+
     def post(self, post: SocialMediaPost) -> LogType: ...
 
 
