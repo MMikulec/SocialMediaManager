@@ -26,10 +26,21 @@ class BotManager:
                     platform_classes[module_name.lower()] = bot_class
         return platform_classes
 
+    def refresh_platform_classes(self):
+        """Reloads the bot classes from the bots directory."""
+        new_classes = self.load_platform_post_classes()
+        self.platform_classes.update(new_classes)  # Update existing dictionary with any new entries
+
     def load_bot(self, platform_name: str) -> Optional[SocialMediaProtocol]:
         platform_name = platform_name.lower()  # Normalize to lowercase
         if platform_name not in self.bot_instances:
             bot_class = self.platform_classes.get(platform_name)
+
+            if not bot_class:
+                # Attempt to reload the platform classes if bot not found
+                self.refresh_platform_classes()
+                bot_class = self.platform_classes.get(platform_name)
+
             if bot_class:
                 try:
                     bot_instance = bot_class(self.excel_file_name)  # Instantiate the bot class
@@ -40,4 +51,5 @@ class BotManager:
                     logger.error(f"Error instantiating bot for platform {platform_name}: {e}")
             else:
                 logger.error(f"No bot class found for platform: {platform_name}")
+
         return self.bot_instances.get(platform_name)
