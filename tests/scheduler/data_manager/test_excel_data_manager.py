@@ -5,7 +5,7 @@ from pandas.testing import assert_frame_equal
 
 import pytest
 # Adjust the import according to your project structure
-from scheduler_.data_manager.excel_data_manager import ExcelDataManager
+from scheduler.data_manager.excel_data_manager import ExcelDataManager
 
 
 # Create a fixture for the ExcelDataManager
