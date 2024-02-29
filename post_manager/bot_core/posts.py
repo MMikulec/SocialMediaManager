@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import pandas as pd
 
 
 @dataclass
@@ -16,3 +17,18 @@ class SocialMediaPost:
     content: str
     image_path: str
     hashtags: str
+
+    @staticmethod
+    def from_dataframe_row(row: pd.Series) -> 'SocialMediaPost':
+        """
+        Converts a row from a DataFrame into a SocialMediaPost object.
+
+        :param row: A pandas Series object representing the data for a single post.
+        :return: A SocialMediaPost object populated with the data from the row.
+        """
+        return SocialMediaPost(
+            post_id=row['Post ID'],
+            content=row['Content'],
+            image_path=row['Image Path'],
+            hashtags=row['Hashtags']
+        )

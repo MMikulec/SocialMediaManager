@@ -11,7 +11,7 @@ class AsyncTaskScheduler(AsyncIOScheduler):
         self.add_listener(self._my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
         self.jobs = {}
 
-    async def _my_listener(self, event):
+    def _my_listener(self, event):
         # Your custom listener logic for asynchronous context
         pass
 

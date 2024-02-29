@@ -27,31 +27,38 @@ class PostExecutor:
         """
         # Iterate through the DataFrame rows
         for index, row in dataframe.iterrows():
+            # Assuming 'row' is a Series from your DataFrame
+            social_media_post = SocialMediaPost.from_dataframe_row(row)
+
             # Schedule each post based on the DataFrame's information
             scheduled_time = row['Scheduled Time']  # Updated to correct column name
             platform = row['Platform']  # Updated to correct column name
             content = row['Content']  # Updated to correct column name
+
             # Only schedule if Status is 'Scheduled'
             if row['Status'] == 'Scheduled':
                 # Schedule the post
                 self.task_scheduler.add_job(
-                    self.execute_post, 'date', run_date=scheduled_time, args=[platform, content]
+                    self.execute_post, 'date', run_date=scheduled_time, args=[platform, social_media_post]
                 )
 
         self.task_scheduler.start()
 
-    async def execute_post(self, platform: str, content: str):
+    async def execute_post(self, platform: str, post: SocialMediaPost):
         """
         Executes a post using the appropriate bot based on the platform.
 
         This method is used as a callback for the AsyncTaskScheduler to post content on the specified social media platform.
 
+        :param post: SocialMediaPost
         :param platform: The platform on which to post.
-        :param content: The content of the post.
         """
-        print(f'Posting {platform} to {content}')
+        print(f'Posting to {platform} Post {post}')
+
         # Load the bot for the specified platform
-        """bot = self.bot_manager.load_bot(platform)
+        bot = self.bot_manager.load_bot(platform)
+
+        """
         if bot:
             # Execute the post
             print(content)
