@@ -1,7 +1,8 @@
 import asyncio
-import pandas as pd  # Adjusted import statement
+import pandas as pd
 from scheduler.scheduling.async_task_scheduler import AsyncTaskScheduler
 from scheduler.social_media.bot_manager import BotManager
+from post_manager.bot_core.posts import SocialMediaPost
 
 
 class PostExecutor:
@@ -33,7 +34,7 @@ class PostExecutor:
             # Only schedule if Status is 'Scheduled'
             if row['Status'] == 'Scheduled':
                 # Schedule the post
-                await self.task_scheduler.add_job(
+                self.task_scheduler.add_job(
                     self.execute_post, 'date', run_date=scheduled_time, args=[platform, content]
                 )
 
@@ -59,8 +60,11 @@ class PostExecutor:
             print(f"No bot found for platform {platform}")"""
 
 
+"""
+from scheduler.social_media.post_executor import PostExecutor
 from datetime import datetime, timedelta
-
+import asyncio
+import pandas as pd 
 
 async def main():
     # Initialize the PostExecutor with the path to the Excel file
@@ -91,3 +95,4 @@ async def run_main():
 
 if __name__ == '__main__':
     asyncio.run(run_main())
+    """

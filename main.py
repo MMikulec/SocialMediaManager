@@ -34,7 +34,7 @@ def main():
         display_dataframe_as_table(excel_manager.load_current_date_posts(), "Today's posts")
 
     excel_task_scheduler.start()
-    excel_task_scheduler.list_scheduled_jobs()
+    print(excel_task_scheduler.get_jobs())
 
 
 if __name__ == "__main__":
