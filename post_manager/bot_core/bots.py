@@ -1,4 +1,5 @@
 import logging
+import pandas as pd
 from abc import ABC, abstractmethod
 from typing import Protocol, runtime_checkable
 
@@ -20,6 +21,8 @@ class SocialMediaProtocol(Protocol):
         self.excel_file_name = excel_file_name
 
     def post(self, post: SocialMediaPost) -> LogType: ...
+
+    def create_post_from_dataframe_row(self, row: pd.Series) -> SocialMediaPost: ...
 
 
 class SocialMediaBot(ABC, metaclass=SingletonMeta):
@@ -65,6 +68,10 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
         Returns:
             AuthManager: An instance of AuthManager for handling authentication.
         """
+        pass
+
+    @abstractmethod
+    def create_post_from_dataframe_row(self, row: pd.Series) -> SocialMediaPost:
         pass
 
     @abstractmethod
