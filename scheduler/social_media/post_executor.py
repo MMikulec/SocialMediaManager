@@ -17,7 +17,26 @@ class PostExecutor:
         self.task_scheduler = AsyncTaskScheduler()
         self.df = dataframe
 
-    async def schedule_posts_from_dataframe(self):
+    async def start(self):
+        """
+        Start the event loop and continuously check the number of scheduled tasks.
+        If there are no more tasks, stop the loop.
+        """
+        try:
+            self.schedule_posts_from_dataframe()
+
+            while True:
+                await asyncio.sleep(1)
+                if len(self.task_scheduler.get_jobs()) == 0:
+                    break
+        except KeyboardInterrupt:
+            # Handle keyboard interrupt if needed
+            pass
+        finally:
+            # Stop the task scheduler
+            self.task_scheduler.shutdown()
+
+    def schedule_posts_from_dataframe(self):
         """
         Schedules posts from a pandas DataFrame.
 
@@ -92,4 +111,29 @@ async def run_main():
 
 if __name__ == '__main__':
     asyncio.run(run_main())
+    
+####################################x
+from scheduler.social_media.post_executor import PostExecutor
+from datetime import datetime, timedelta
+import asyncio
+import pandas as pd 
+def main():
+    # Create a DataFrame representing today's posts
+    today_posts_df = pd.DataFrame({
+        'Post ID': [1, 2, 3],
+        'Platform': ['Instagram', 'Facebook', 'Instagram'],
+        'Content': ['Check out our new product', 'New product launch', 'Product giveaway'],
+        'Image Path': ['img1', 'img1', 'img1'],
+        'Hashtags': ['#new #tech #insta', '#new #tech #fcbk', '#new #tech #insta'],
+        'Scheduled Time': [datetime.now() + timedelta(minutes=1), datetime.now() + timedelta(minutes=0),
+                           datetime.now() - timedelta(days=1)],
+        'Status': ['Scheduled', 'Scheduled', 'Posted'],
+        'Remarks': ['', '', '']
+    })
+    # Initialize the PostExecutor with the path to the Excel file
+    post_executor = PostExecutor('path_to_your_excel_file.xlsx', dataframe=today_posts_df)
+    # Schedule posts from the DataFrame
+    asyncio.run(post_executor.start())
+    
+main()
     """

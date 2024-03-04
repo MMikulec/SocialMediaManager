@@ -119,9 +119,8 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
         if isinstance(level, str):
             level = getattr(logging, level.upper(), logging.INFO)
 
-        # Log the message at the specified level
-        self.logs.log(level, message)
+        # Combine message and data if data is present
+        combined_message = message + (f" | Additional data: {data}" if data else "")
 
-        # Log additional data at DEBUG level, if present
-        if data:
-            self.logs.debug(f"Additional data: {data}")
+        # Log the combined message at the specified level
+        self.logs.log(level, combined_message)
