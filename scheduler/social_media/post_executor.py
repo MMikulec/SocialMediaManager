@@ -16,6 +16,8 @@ class PostExecutor:
         self.bot_manager = BotManager(excel_file_name)
         self.task_scheduler = AsyncTaskScheduler()
         self.df = dataframe
+        # Track running tasks
+        self.running_tasks = {}
 
     async def start(self):
         """
@@ -26,8 +28,9 @@ class PostExecutor:
             self.schedule_posts_from_dataframe()
 
             while True:
-                await asyncio.sleep(1)
-                if len(self.task_scheduler.get_jobs()) == 0:
+                await asyncio.sleep(5)
+                # Check if there are no more scheduled jobs and all running tasks are completed
+                if not self.task_scheduler.get_jobs() and all(not status for status in self.running_tasks.values()):
                     break
         except KeyboardInterrupt:
             # Handle keyboard interrupt if needed
@@ -68,72 +71,15 @@ class PostExecutor:
         :param platform: The platform on which to post.
         :param row:
         """
-        logger.debug(f'Data to post:\nPosting to {platform}\nPost: \n{row}')
+        # Before starting the actual execution, mark this task as running
+        self.running_tasks[row['Post ID']] = True
+        try:
+            logger.debug(f'Data to post:\nPosting to {platform}\nPost: \n{row}')
 
-        # Load the bot for the specified platform
-        bot = self.bot_manager.load_bot(platform)
-        post = bot.create_post_from_dataframe_row(row)
-        await bot.post(post)
-
-
-"""
-from scheduler.social_media.post_executor import PostExecutor
-from datetime import datetime, timedelta
-import asyncio
-import pandas as pd 
-
-async def main():
-    # Create a DataFrame representing today's posts
-    today_posts_df = pd.DataFrame({
-        'Post ID': [1, 2, 3],
-        'Platform': ['Instagram', 'Facebook', 'Instagram'],
-        'Content': ['Check out our new product', 'New product launch', 'Product giveaway'],
-        'Image Path': ['img1', 'img1', 'img1'],
-        'Hashtags': ['#new #tech #insta', '#new #tech #fcbk', '#new #tech #insta'],
-        'Scheduled Time': [datetime.now() + timedelta(minutes=1), datetime.now() + timedelta(minutes=0),
-                           datetime.now() - timedelta(days=1)],
-        'Status': ['Scheduled', 'Scheduled', 'Posted'],
-        'Remarks': ['', '', '']
-    })
-    # Initialize the PostExecutor with the path to the Excel file
-    post_executor = PostExecutor('path_to_your_excel_file.xlsx', dataframe=today_posts_df)
-    # Schedule posts from the DataFrame
-    await post_executor.schedule_posts_from_dataframe()
-
-    # Keep the event loop running until all tasks are completed
-    while asyncio.all_tasks():
-        await asyncio.sleep(1)  # Sleep to avoid busy looping
-
-
-async def run_main():
-    await main()
-
-
-if __name__ == '__main__':
-    asyncio.run(run_main())
-    
-####################################x
-from scheduler.social_media.post_executor import PostExecutor
-from datetime import datetime, timedelta
-import asyncio
-import pandas as pd 
-def main():
-    # Create a DataFrame representing today's posts
-    today_posts_df = pd.DataFrame({
-        'Post ID': [1, 2, 3],
-        'Platform': ['Instagram', 'Facebook', 'Instagram'],
-        'Content': ['Check out our new product', 'New product launch', 'Product giveaway'],
-        'Image Path': ['img1', 'img1', 'img1'],
-        'Hashtags': ['#new #tech #insta', '#new #tech #fcbk', '#new #tech #insta'],
-        'Scheduled Time': [datetime.now() + timedelta(minutes=1), datetime.now() + timedelta(minutes=0),
-                           datetime.now() - timedelta(days=1)],
-        'Status': ['Scheduled', 'Scheduled', 'Posted'],
-        'Remarks': ['', '', '']
-    })
-    # Initialize the PostExecutor with the path to the Excel file
-    post_executor = PostExecutor('path_to_your_excel_file.xlsx', dataframe=today_posts_df)
-    # Schedule posts from the DataFrame
-    asyncio.run(post_executor.start())
-    
-main()
-    """
+            # Load the bot for the specified platform
+            bot = self.bot_manager.load_bot(platform)
+            post = bot.create_post_from_dataframe_row(row)
+            await bot.post(post)
+        finally:
+            # Once execution is complete, mark it as not running
+            self.running_tasks[row['Post ID']] = False

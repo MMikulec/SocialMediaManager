@@ -16,8 +16,6 @@ from dataclasses import dataclass, asdict
 import threading
 import time
 
-request_lock = threading.Lock()
-
 
 @dataclass
 class FacebookPost(SocialMediaPost):
@@ -62,15 +60,15 @@ class FacebookBot(SocialMediaBot):
 
     @auto_log
     async def post(self, post: FacebookPost) -> LogType:
-        with request_lock:
-            # Simulate the request operation
-            print(f"Posting {post}...")
 
-            # Simulated delay or network operation
-            await asyncio.sleep(random.uniform(0.1, 0.3))
+        # Simulate the request operation
+        print(f"Posting {post}...")
 
-            # This is where you would include your request code
-            # For demonstration, we assume it's successful
+        # Simulated delay or network operation
+        await asyncio.sleep(random.uniform(0.1, 0.3))
+
+        # This is where you would include your request code
+        # For demonstration, we assume it's successful
 
         # The return value will be picked up by the auto_log decorator
         return logging.DEBUG, "message", True
