@@ -1,3 +1,4 @@
+import asyncio
 import time
 from pathlib import Path
 from logger_config import logger, console
@@ -21,6 +22,10 @@ def main():
     # Initialize the scheduler and configure tasks using the TaskScheduler class
     excel_task_scheduler = TaskScheduler()
 
+    # Initialize post executor and load current data
+    post_task_executor = PostExecutor(excel_file_path.name, excel_manager.load_current_date_posts())
+    asyncio.run(post_task_executor.start())
+
     @excel_task_scheduler.job('cron', hour=23, minute=0, id='update_excel')
     def update_excel_from_logs():
         """Updates the Excel file with today's logs and saves changes."""
@@ -32,6 +37,9 @@ def main():
         """Loads today's posts from Excel and displays them."""
         excel_manager.load_excel_data()
         display_dataframe_as_table(excel_manager.load_current_date_posts(), "Today's posts")
+
+        post_task_executor.update_executor(excel_file_path.name, excel_manager.load_current_date_posts())
+        asyncio.run(post_task_executor.start())
 
     excel_task_scheduler.start()
     print(excel_task_scheduler.get_jobs())

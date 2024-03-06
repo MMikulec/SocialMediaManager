@@ -104,7 +104,6 @@ class ContextualLogger(logging.LoggerAdapter):
         self.extra.update(kwargs)
 
 
-# TODO: Marek: Create singleton class for logs
 class LoggerSingleton:
     _instances = {}
     _lock = threading.Lock()  # Class-level lock

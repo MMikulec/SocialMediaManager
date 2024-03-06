@@ -19,6 +19,18 @@ class PostExecutor:
         # Track running tasks
         self.running_tasks = {}
 
+    def update_executor(self, new_excel_file_name: str, new_dataframe: pd.DataFrame):
+        """
+        Updates the PostExecutor with new attributes and re-initializes the AsyncTaskScheduler.
+
+        :param new_excel_file_name: The new name of the Excel file to use for bot management.
+        :param new_dataframe: The new DataFrame containing the posts data.
+        """
+        self.bot_manager = BotManager(new_excel_file_name)
+        self.df = new_dataframe
+        self.task_scheduler = AsyncTaskScheduler()
+        self.running_tasks = {}
+
     async def start(self):
         """
         Start the event loop and continuously check the number of scheduled tasks.
