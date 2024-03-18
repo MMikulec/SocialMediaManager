@@ -10,7 +10,7 @@ from logger_config import logger
 
 def setup_bot_logs(excel_file_name):
     """Set up a logs for a specific Excel file."""
-    logs_dir = 'post_manager/logs'
+    logs_dir = 'bot_manager/logs'
     excel_base_name = os.path.splitext(os.path.basename(excel_file_name))[0]
     log_file = f'{logs_dir}/{excel_base_name}_posts.log'
 

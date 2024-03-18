@@ -1,0 +1,62 @@
+{
+    "facebook": [
+        {
+            "user_name": "user1",
+            "app_id": "user1_facebook_app_id",
+            "app_secret": "user1_facebook_app_secret",
+            "access_token": "user1_facebook_access_token",
+            "page_id": "user1_facebook_page_id"
+        },
+        {
+            "user_name": "user2",
+            "app_id": "user2_facebook_app_id",
+            "app_secret": "user2_facebook_app_secret",
+            "access_token": "user2_facebook_access_token",
+            "page_id": "user2_facebook_page_id"
+        }
+    ],
+    "instagram": [
+        {
+            "user_name": "user1",
+            "app_id": "user1_instagram_app_id",
+            "app_secret": "user1_instagram_app_secret",
+            "access_token": "user1_instagram_access_token"
+        },
+        {
+            "user_name": "user2",
+            "app_id": "user2_instagram_app_id",
+            "app_secret": "user2_instagram_app_secret",
+            "access_token": "user2_instagram_access_token"
+        }
+    ],
+    "twitter": [
+        {
+            "user_name": "user1",
+            "api_key": "user1_twitter_api_key",
+            "api_secret_key": "user1_twitter_api_secret_key",
+            "access_token": "user1_twitter_access_token",
+            "access_token_secret": "user1_twitter_access_token_secret"
+        },
+        {
+            "user_name": "user2",
+            "api_key": "user2_twitter_api_key",
+            "api_secret_key": "user2_twitter_api_secret_key",
+            "access_token": "user2_twitter_access_token",
+            "access_token_secret": "user2_twitter_access_token_secret"
+        }
+    ],
+    "linkedin": [
+        {
+            "user_name": "user1",
+            "client_id": "user1_linkedin_client_id",
+            "client_secret": "user1_linkedin_client_secret",
+            "access_token": "user1_linkedin_access_token"
+        },
+        {
+            "user_name": "user2",
+            "client_id": "user2_linkedin_client_id",
+            "client_secret": "user2_linkedin_client_secret",
+            "access_token": "user2_linkedin_access_token"
+        }
+    ]
+}

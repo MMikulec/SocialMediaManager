@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from post_manager.bot_core.singleton import SingletonMeta
+from bot_manager.bot_core.singleton import SingletonMeta
 
 
 class AuthManager(ABC, metaclass=SingletonMeta):

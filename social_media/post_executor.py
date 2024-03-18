@@ -1,8 +1,7 @@
 import asyncio
 import pandas as pd
-from scheduler.scheduling.async_task_scheduler import AsyncTaskScheduler
-from scheduler.social_media.bot_manager import BotManager
-from post_manager.bot_core.posts import SocialMediaPost
+from task_management.scheduling.async_task_scheduler import AsyncTaskScheduler
+from social_media.bot_manager import BotManager
 from logger_config import logger, console
 
 
@@ -78,7 +77,8 @@ class PostExecutor:
         """
         Executes a post using the appropriate bot based on the platform.
 
-        This method is used as a callback for the AsyncTaskScheduler to post content on the specified social media platform.
+        This method is used as a callback for the AsyncTaskScheduler
+        to post content on the specified social media platform.
 
         :param platform: The platform on which to post.
         :param row:

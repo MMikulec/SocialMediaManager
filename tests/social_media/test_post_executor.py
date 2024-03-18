@@ -4,7 +4,7 @@ import pytest
 import pandas as pd
 from datetime import datetime, timedelta
 import asyncio
-from scheduler.social_media.post_executor import PostExecutor
+from social_media.post_executor import PostExecutor
 
 
 # Parameterize the test function to accept different numbers of posts
@@ -13,7 +13,7 @@ def test_post_executor_start(num_posts):
     # Create a DataFrame with 'num_posts' posts
     platforms = ['Instagram', 'Facebook', 'Instagram'] * (num_posts // 3) + ['Instagram', 'Facebook', 'Instagram'][
                                                                             :num_posts % 3]
-    scheduled_times = [datetime.now() + timedelta(minutes=1) for _ in range(num_posts)]
+    scheduled_times = [datetime.now() + timedelta(minutes=0) for _ in range(num_posts)]
 
     posts_df = pd.DataFrame({
         'Post ID': range(1, num_posts + 1),

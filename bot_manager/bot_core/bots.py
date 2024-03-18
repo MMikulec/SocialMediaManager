@@ -3,11 +3,11 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from typing import Protocol, runtime_checkable
 
-from post_manager.bot_core import LogType
-from post_manager.bot_core.auth import AuthManager
-from post_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger, LoggerSingleton
-from post_manager.bot_core.posts import SocialMediaPost
-from post_manager.bot_core.singleton import SingletonMeta
+from bot_manager.bot_core import LogType
+from bot_manager.bot_core.auth import AuthManager
+from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger, LoggerSingleton
+from bot_manager.bot_core.posts import SocialMediaPost
+from bot_manager.bot_core.singleton import SingletonMeta
 
 
 @runtime_checkable
@@ -31,7 +31,7 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
 
     Attributes:
         logs (ContextualLogger): Logger for recording bot activities, configured per bot instance.
-        auth_manager (post_manager.bot_core.auth.AuthManager): Authentication manager instance for handling API authentication.
+        auth_manager (bot_manager.bot_core.auth.AuthManager): Authentication manager instance for handling API authentication.
     """
 
     def __init__(self, excel_file_name):

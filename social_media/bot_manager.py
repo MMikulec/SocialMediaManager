@@ -2,7 +2,7 @@ import os
 import importlib
 from typing import Dict, Type, Optional
 from pathlib import Path
-from post_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Import the protocol and post class
+from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Import the protocol and post class
 from logger_config import logger, console
 
 
@@ -15,11 +15,11 @@ class BotManager:
     def load_platform_post_classes(self) -> Dict[str, Type[SocialMediaProtocol]]:
         platform_classes = {}
         # Assuming your bots.py file is in the correct location relative to this file
-        bots_dir = Path(__file__).parent.parent.parent / 'post_manager' / 'bots'
+        bots_dir = Path(__file__).parent.parent / 'bot_manager' / 'bots'
         for file in bots_dir.iterdir():
             if file.is_file() and file.suffix == '.py' and file.name != '__init__.py':
                 module_name = file.stem  # Extracts the file name without '.py'
-                module = importlib.import_module(f'post_manager.bots.{module_name}')
+                module = importlib.import_module(f'bot_manager.bots.{module_name}')
                 class_name = module_name.capitalize() + 'Bot'  # Construct the class name based on file name
                 bot_class = getattr(module, class_name, None)
                 if bot_class and issubclass(bot_class, SocialMediaProtocol):

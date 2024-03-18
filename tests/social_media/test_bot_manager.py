@@ -1,7 +1,7 @@
 #  Copyright (c) 2024.
 import pytest
-from scheduler.social_media.bot_manager import BotManager  # Assuming BotManager is in this location
-from post_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Adjust if necessary
+from social_media.bot_manager import BotManager  # Assuming BotManager is in this location
+from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Adjust if necessary
 
 
 def test_load_platform_post_classes():

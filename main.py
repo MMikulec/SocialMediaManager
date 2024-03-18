@@ -2,15 +2,14 @@ import asyncio
 import time
 from pathlib import Path
 from logger_config import logger, console
-from apscheduler.schedulers.background import BackgroundScheduler
 
-from scheduler import ExcelDataManager, LogDataManager, TaskScheduler, PostExecutor, BotManager, \
-    display_dataframe_as_table
+from task_management import ExcelDataManager, LogDataManager, TaskScheduler, display_dataframe_as_table
+from social_media import PostExecutor
 
 
 def main():
     excel_file_path = Path("plan.xlsx")
-    log_file_path = Path(f'post_manager/logs/{excel_file_path.stem}_posts.log')
+    log_file_path = Path(f'bot_manager/logs/{excel_file_path.stem}_posts.log')
 
     excel_manager = ExcelDataManager(excel_file_path)
     log_manager = LogDataManager(log_file_path)
