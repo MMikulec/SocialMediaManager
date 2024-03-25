@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from bot_manager.bot_core.singleton import SingletonMeta
 
 
-class AuthManager(ABC, metaclass=SingletonMeta):
+class PlatformAuthenticator(ABC, metaclass=SingletonMeta):
     """
     Abstract base class for authentication management with social media APIs.
 

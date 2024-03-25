@@ -1,22 +1,31 @@
 import asyncio
 import pandas as pd
+from pathlib import Path
 from task_management.scheduling.async_task_scheduler import AsyncTaskScheduler
 from social_media.bot_manager import BotManager
 from logger_config import logger, console
+from bot_manager.bot_core.errors import CredentialError
 
 
 class PostExecutor:
-    def __init__(self, excel_file_name: str, dataframe: pd.DataFrame):
+    def __init__(self, file_path: Path, dataframe: pd.DataFrame):
         """
         Initializes the PostExecutor with necessary attributes.
 
-        :param excel_file_name: The name of the Excel file to use for bot management.
+        :param file_path: The name of the Excel file to use for bot management.
         """
-        self.bot_manager = BotManager(excel_file_name)
+        self.bot_manager = BotManager(file_path.name)
         self.task_scheduler = AsyncTaskScheduler()
         self.df = dataframe
         # Track running tasks
         self.running_tasks = {}
+
+        # Derive the credentials file path from the Excel file name
+        # This assumes both files are in the same directory and credentials file has a .json extension
+        self.credentials_file_path = file_path.with_suffix('.json')
+
+        # Initialize an empty auth manager; we'll set this up properly in an async method
+        self.auth_manager = None
 
     def update_executor(self, new_excel_file_name: str, new_dataframe: pd.DataFrame):
         """
@@ -91,7 +100,13 @@ class PostExecutor:
             # Load the bot for the specified platform
             bot = self.bot_manager.load_bot(platform)
             post = bot.create_post_from_dataframe_row(row)
-            await bot.post(post)
+            # await bot.post(post)
+
+            # # TODO: Create except with code, which update credentials data.
+            try:
+                result = await bot.post(post)
+            except CredentialError:
+                pass
         finally:
             # Once execution is complete, mark it as not running
             self.running_tasks[row['Post ID']] = False

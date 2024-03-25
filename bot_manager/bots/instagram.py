@@ -8,7 +8,7 @@ from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger
 from bot_manager.bot_core.posts import SocialMediaPost
 from bot_manager.bot_core.bots import SocialMediaBot
 from bot_manager.bot_core.utils import auto_log
-from bot_manager.bot_core.auth import AuthManager
+from bot_manager.bot_core.authenticator import PlatformAuthenticator
 from bot_manager.bot_core import LogType
 from logger_config import logger, console
 from dataclasses import dataclass, asdict
@@ -36,7 +36,7 @@ class InstagramPost(SocialMediaPost):
         return cls(**base_post_dict)
 
 
-class AuthManagerInstagram(AuthManager):
+class PlatformAuthenticatorInstagram(PlatformAuthenticator):
     def login(self):
         # Instagram-specific login logic
         print("Instagram login")
@@ -52,7 +52,7 @@ class InstagramBot(SocialMediaBot):
     platform_name = property(lambda self: "Instagram")
 
     def create_auth_manager(self, api_key, api_secret):
-        return AuthManagerInstagram(api_key, api_secret)
+        return PlatformAuthenticatorInstagram(api_key, api_secret)
 
     def create_post_from_dataframe_row(self, row: pd.Series) -> InstagramPost:
         instagram_post = InstagramPost.from_dataframe_row(row)

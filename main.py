@@ -22,7 +22,7 @@ def main():
     excel_task_scheduler = TaskScheduler()
 
     # Initialize post executor and load current data
-    post_task_executor = PostExecutor(excel_file_path.name, excel_manager.load_current_date_posts())
+    post_task_executor = PostExecutor(excel_file_path, excel_manager.load_current_date_posts())
     asyncio.run(post_task_executor.start())
 
     @excel_task_scheduler.job('cron', hour=23, minute=0, id='update_excel')

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol, runtime_checkable
 
 from bot_manager.bot_core import LogType
-from bot_manager.bot_core.auth import AuthManager
+from bot_manager.bot_core.authenticator import PlatformAuthenticator
 from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger, LoggerSingleton
 from bot_manager.bot_core.posts import SocialMediaPost
 from bot_manager.bot_core.singleton import SingletonMeta
@@ -31,7 +31,7 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
 
     Attributes:
         logs (ContextualLogger): Logger for recording bot activities, configured per bot instance.
-        auth_manager (bot_manager.bot_core.auth.AuthManager): Authentication manager instance for handling API authentication.
+        auth_manager (bot_manager.bot_core.authenticator.PlatformAuthenticator): Authentication manager instance for handling API authentication.
     """
 
     def __init__(self, excel_file_name):
@@ -57,7 +57,7 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
         pass
 
     @abstractmethod
-    def create_auth_manager(self, api_key: str, api_secret: str) -> AuthManager:
+    def create_auth_manager(self, api_key: str, api_secret: str) -> PlatformAuthenticator:
         """
         Factory method to create an AuthManager instance specific to the social media platform.
 
@@ -66,7 +66,7 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
             api_secret (str): API secret for secure authentication.
 
         Returns:
-            AuthManager: An instance of AuthManager for handling authentication.
+            PlatformAuthenticator: An instance of AuthManager for handling authentication.
         """
         pass
 
