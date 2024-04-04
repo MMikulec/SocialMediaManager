@@ -20,13 +20,6 @@ class PostExecutor:
         # Track running tasks
         self.running_tasks = {}
 
-        # Derive the credentials file path from the Excel file name
-        # This assumes both files are in the same directory and credentials file has a .json extension
-        self.credentials_file_path = file_path.with_suffix('.json')
-
-        # Initialize an empty auth manager; we'll set this up properly in an async method
-        self.auth_manager = None
-
     def update_executor(self, new_excel_file_name: str, new_dataframe: pd.DataFrame):
         """
         Updates the PostExecutor with new attributes and re-initializes the AsyncTaskScheduler.

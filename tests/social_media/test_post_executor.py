@@ -4,6 +4,7 @@ import pytest
 import pandas as pd
 from datetime import datetime, timedelta
 import asyncio
+from pathlib import Path
 from social_media.post_executor import PostExecutor
 
 
@@ -26,7 +27,7 @@ def test_post_executor_start(num_posts):
         'Remarks': [''] * num_posts,
     })
 
-    post_executor = PostExecutor('post_executor_test.xlsx', posts_df)
+    post_executor = PostExecutor(Path('post_executor_test.xlsx'), posts_df)
     asyncio.run(post_executor.start())
 
     # Here you should add assertions that validate the behavior of your PostExecutor.

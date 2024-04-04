@@ -20,12 +20,21 @@ class AuthManager:
             self.credentials = json.loads(content)
             return self.credentials
 
-    def get_credentials(self, platform_name: str, user_name: str) -> Optional[Dict]:
-        """Retrieve credentials for a specific user and platform."""
+    def get_credentials(self, platform_name: str, user_name: str = 'default'):
+        """Retrieve credentials for a specific user and platform, or the first user if 'default' or not specified."""
         platform_credentials = self.credentials.get(platform_name.lower(), [])
+
+        # Handle 'default' user_name by returning the first user's credentials for the platform
+        if user_name == 'default' or not user_name:
+            return platform_credentials[0] if platform_credentials else None
+
+        # If a specific user_name is provided, search for that user's credentials
         for user_credentials in platform_credentials:
             if user_credentials.get("user_name") == user_name:
                 return user_credentials
+
+        # If the user_name is provided but not found, you might want to handle this case, e.g., by returning None
+        # or raising an exception. For simplicity, here we return None.
         return None
 
     async def update_credentials(self, platform_name: str, user_name: str, new_credentials: Dict):
@@ -48,18 +57,3 @@ class AuthManager:
     def list_users(self, platform_name: str) -> List[str]:
         """List all users for a given platform."""
         return [user_cred['user_name'] for user_cred in self.credentials.get(platform_name.lower(), [])]
-
-
-import asyncio
-import pprint
-
-
-async def main():
-    auth_manager = AuthManager(Path('../plan.json'))
-    await auth_manager.load_credentials()  # Ensure credentials are loaded asynchronously
-    pprint.pprint(auth_manager.get_credentials('facebook', 'user1'))  # Example usage
-    # Continue with application logic...
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

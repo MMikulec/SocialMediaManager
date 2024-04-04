@@ -56,3 +56,28 @@ async def test_list_users(temp_credentials_file):
     users = auth_manager.list_users("facebook")
     assert "testuser1" in users
     assert "testuser2" in users
+
+
+@pytest.mark.asyncio
+async def test_load_credentials_nonexistent_file():
+    auth_manager = AuthManager(Path("nonexistent_file.json"))
+    with pytest.raises(FileNotFoundError):
+        await auth_manager.load_credentials()
+
+
+@pytest.mark.asyncio
+async def test_load_credentials_missing_data(temp_credentials_file_missing_data):
+    auth_manager = AuthManager(await temp_credentials_file_missing_data)
+    await auth_manager.load_credentials()
+    # Test specific behavior, like default values being set or missing data being handled
+    assert auth_manager.credentials == {}, "Should handle missing data gracefully."
+
+
+@pytest.fixture
+async def temp_credentials_file_missing_data(tmp_path):
+    """Create a temporary JSON file with missing data for testing."""
+    incomplete_content = "{}"  # Example of missing data
+    file_path = tmp_path / "missing_data_credentials.json"
+    async with aiofiles.open(file_path, 'w') as f:
+        await f.write(incomplete_content)
+    return file_path
