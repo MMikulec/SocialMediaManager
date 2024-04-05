@@ -37,7 +37,7 @@ def main():
         excel_manager.load_excel_data()
         display_dataframe_as_table(excel_manager.load_current_date_posts(), "Today's posts")
 
-        post_task_executor.update_executor(excel_file_path.name, excel_manager.load_current_date_posts())
+        post_task_executor.update_executor(excel_file_path, excel_manager.load_current_date_posts())
         asyncio.run(post_task_executor.start())
 
     excel_task_scheduler.start()

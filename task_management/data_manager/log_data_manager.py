@@ -11,6 +11,14 @@ class LogDataManager:
         :param log_file_path: Path to the log file.
         """
         self.log_file_path = log_file_path
+        self.ensure_log_file_exists()
+
+    def ensure_log_file_exists(self):
+        """
+        Ensures the log file exists by creating an empty file if it does not exist.
+        """
+        if not self.log_file_path.exists():
+            self.log_file_path.touch()
 
     def read_logs(self, only_today=False):
         """

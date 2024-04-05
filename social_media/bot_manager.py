@@ -7,7 +7,7 @@ from logger_config import logger, console
 
 
 class BotManager:
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: Path):
         self.file_path = file_path
         self.bot_instances: Dict[str, SocialMediaProtocol] = {}
         self.platform_classes = self.load_platform_post_classes()
@@ -43,7 +43,7 @@ class BotManager:
 
             if bot_class:
                 try:
-                    bot_instance = bot_class(self.file_path)  # Instantiate the bot class
+                    bot_instance = bot_class(self.file_path.name)  # Instantiate the bot class
                     self.bot_instances[platform_name] = bot_instance
                     logger.info(f"Created new instance of {bot_class.__name__}.")
                     return bot_instance

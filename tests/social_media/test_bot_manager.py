@@ -1,5 +1,6 @@
 #  Copyright (c) 2024.
 import pytest
+from pathlib import Path
 from social_media.bot_manager import BotManager  # Assuming BotManager is in this location
 from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Adjust if necessary
 
@@ -15,7 +16,7 @@ def test_bot_loading():
     Test if BotManager correctly loads and instantiates bots based on platform names.
     """
     # Initialize the BotManager
-    bot_manager = BotManager("plan.xlsx")
+    bot_manager = BotManager(Path("plan.xlsx"))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
     bot_instance = bot_manager.load_bot('facebook')
