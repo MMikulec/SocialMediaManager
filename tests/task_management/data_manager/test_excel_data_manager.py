@@ -78,7 +78,8 @@ def test_update_main_dataframe(excel_manager):
         'Scheduled Time': [datetime.now().date() + timedelta(days=1), datetime.now().date(),
                            datetime.now().date() - timedelta(days=1)],
         'Status': ['Scheduled', 'Posted', 'Posted'],
-        'Remarks': ['', '', '']
+        'Remarks': ['', '', ''],
+        'User Name': ['default', 'default', 'default']  # Add 'User Name' column to match the modified DataFrame
     })
 
     # Convert 'Scheduled Time' in both DataFrames to date for comparison

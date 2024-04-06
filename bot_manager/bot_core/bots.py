@@ -7,7 +7,7 @@ from bot_manager.bot_core import LogType
 from bot_manager.bot_core.authenticator import PlatformAuthenticator
 from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger, LoggerSingleton
 from bot_manager.bot_core.posts import SocialMediaPost
-from bot_manager.bot_core.singleton import SingletonMeta
+from bot_manager.bot_core.singleton import SingletonMeta, UserBasedSingletonMeta
 
 
 @runtime_checkable
@@ -17,7 +17,8 @@ class SocialMediaProtocol(Protocol):
     an 'excel_file_name' parameter in their constructor for initializing with a specific Excel file.
     """
 
-    def __init__(self, excel_file_name: str):
+    def __init__(self, user_name: str, excel_file_name: str):
+        self.user_name = user_name
         self.excel_file_name = excel_file_name
 
     def post(self, post: SocialMediaPost) -> LogType: ...
@@ -25,7 +26,7 @@ class SocialMediaProtocol(Protocol):
     def create_post_from_dataframe_row(self, row: pd.Series) -> SocialMediaPost: ...
 
 
-class SocialMediaBot(ABC, metaclass=SingletonMeta):
+class SocialMediaBot(ABC, metaclass=UserBasedSingletonMeta):
     """
     Abstract base class for social media bots responsible for posting content.
 
@@ -34,7 +35,8 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
         auth_manager (bot_manager.bot_core.authenticator.PlatformAuthenticator): Authentication manager instance for handling API authentication.
     """
 
-    def __init__(self, excel_file_name):
+    # TODO: 5. 4. 2024: file_path(excel_file_name) to source
+    def __init__(self, user_name,  excel_file_name):
         """
         Initializes the social media bot with a specific Excel file context.
 
@@ -44,6 +46,7 @@ class SocialMediaBot(ABC, metaclass=SingletonMeta):
         """base_logger = setup_bot_logs(excel_file_name)
         self.logs = ContextualLogger(base_logger,
                                      {'excel_file': excel_file_name, 'platform_name': self.platform_name})"""
+        self.user_name = user_name
         self.logs = LoggerSingleton.get_logger(excel_file_name, self.platform_name)
         self.auth_manager = self.create_auth_manager(api_key="your_api_key", api_secret="your_api_secret")
         self.excel_file_name = excel_file_name

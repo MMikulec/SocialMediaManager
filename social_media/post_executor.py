@@ -8,6 +8,7 @@ from bot_manager.bot_core.errors import CredentialError
 
 
 class PostExecutor:
+    # TODO: 5. 4. 2024: file_path to source
     def __init__(self, file_path: Path, dataframe: pd.DataFrame):
         """
         Initializes the PostExecutor with necessary attributes.
@@ -87,15 +88,15 @@ class PostExecutor:
         """
         # Before starting the actual execution, mark this task as running
         self.running_tasks[row['Post ID']] = True
+        # logger.debug(f"User name: {row['User Name']}")
         try:
-            logger.debug(f'Data to post:\nPosting to {platform}\nPost: \n{row}')
+            # logger.debug(f'Data to post:\nPosting to {platform}\nPost: \n{row}')
 
-            # Load the bot for the specified platform
-            bot = self.bot_manager.load_bot(platform)
+            # Load the bot for the specified platform and username
+            bot = self.bot_manager.load_bot(row['User Name'], platform)
             post = bot.create_post_from_dataframe_row(row)
             # await bot.post(post)
 
-            # # TODO: Create except with code, which update credentials data.
             try:
                 result = await bot.post(post)
             except CredentialError:

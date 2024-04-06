@@ -2,7 +2,7 @@ import pytest
 from pathlib import Path
 import pandas as pd
 from datetime import datetime, timedelta
-from scheduler.data_manager.log_data_manager import LogDataManager  # Adjust the import path according to your project structure
+from task_management.data_manager.log_data_manager import LogDataManager  # Adjust the import path according to your project structure
 
 
 @pytest.fixture
