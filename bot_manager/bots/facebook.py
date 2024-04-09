@@ -13,6 +13,8 @@ from bot_manager.bot_core import LogType
 from logger_config import logger, console
 from dataclasses import dataclass, asdict
 
+from social_media.bot_manager import BotManager
+
 import threading
 import time
 
@@ -48,6 +50,7 @@ class PlatformAuthenticatorFacebook(PlatformAuthenticator):
         self.token = "new_facebook_token"
 
 
+@BotManager.register_bot(platform_name='facebook')
 class FacebookBot(SocialMediaBot):
     platform_name = property(lambda self: "Facebook")
 

@@ -10,6 +10,15 @@ from logger_config import logger, console
 
 class BotManager:
     # TODO: 5. 4. 2024: file_path to source
+    _bot_classes = {}  # Registry keyed by platform name
+
+    @classmethod
+    def register_bot(cls, platform_name):
+        def decorator(bot_cls):
+            cls._bot_classes[platform_name.lower()] = bot_cls
+            return bot_cls
+        return decorator
+
     def __init__(self, file_path: Path):
         self.file_path = file_path
         # self.auth_manager = AuthManager(file_path.with_suffix('.json'))
@@ -38,12 +47,12 @@ class BotManager:
                     platform_classes[module_name.lower()] = bot_class
         return platform_classes
 
-    def refresh_platform_classes(self):
-        """Reloads the bot classes from the bots directory."""
+    """def refresh_platform_classes(self):
+        #Reloads the bot classes from the bots directory.
         new_classes = self.load_platform_post_classes()
-        self.platform_classes.update(new_classes)  # Update existing dictionary with any new entries
+        self.platform_classes.update(new_classes)  # Update existing dictionary with any new entries"""
 
-    def load_bot(self, user_name: str, platform_name: str) -> Optional[SocialMediaProtocol]:
+    """def load_bot(self, user_name: str, platform_name: str) -> Optional[SocialMediaProtocol]:
         platform_name = platform_name.lower()  # Normalize to lowercase
         # Adjusted to create a tuple key of user_name and platform_name
         key = (user_name, platform_name)
@@ -64,4 +73,27 @@ class BotManager:
                     logger.error(f"Error instantiating bot for platform {platform_name} and user {user_name}: {e}")
             else:
                 logger.error(f"No bot class found for platform: {platform_name}")
-        return self.bot_instances.get(key)
+        return self.bot_instances.get(key)"""
+
+    def load_bot(self, user_name: str, platform_name: str) -> Optional[SocialMediaProtocol]:
+        platform_name = platform_name.lower()
+        bot_class = self._bot_classes.get(platform_name)
+
+        if not bot_class:
+            logger.error(f"No bot class found for platform: {platform_name}")
+            return None
+
+        # Adjusted to key instances by both platform and user
+        key = (platform_name, user_name.lower())
+        if key not in self.bot_instances:
+            try:
+                bot_instance = bot_class(user_name, self.file_path)
+                self.bot_instances[key] = bot_instance
+                logger.debug(
+                    f"Created new instance of {bot_class.__name__} for user {user_name} on platform {platform_name}.")
+            except Exception as e:
+                logger.error(f"Error instantiating bot for platform {platform_name} and user {user_name}: {e}")
+                return None
+
+        return self.bot_instances[key]
+
