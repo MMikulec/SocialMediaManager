@@ -10,7 +10,7 @@ def test_bot_loading():
     Test if BotManager correctly loads and instantiates bots based on platform names.
     """
     # Initialize the BotManager
-    bot_manager = BotManager(Path("plan.xlsx"))
+    bot_manager = BotManager(Path("../plan.xlsx"))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
     bot_instance = bot_manager.load_bot("default", 'facebook')

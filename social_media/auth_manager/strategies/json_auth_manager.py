@@ -1,10 +1,16 @@
-import json
+# json_auth_manager.py
 from pathlib import Path
-from typing import Dict, Optional, List
-import aiofiles  # Import the aiofiles library for async file operations
+from typing import Optional, Dict, List
+
+from social_media.auth_manager.auth_manager_base import AbstractAuthManager
+import aiofiles
+import json
+
+from social_media.auth_manager.auth_manager import AuthManager
 
 
-class AuthManager:
+@AuthManager.register_auth_strategy('json')
+class JSONAuthManager(AbstractAuthManager):
     def __init__(self, credentials_file_path: Path):
         self.credentials_file_path = credentials_file_path
         # Note: We have to change how we initially load credentials since __init__ can't be async

@@ -1,8 +1,10 @@
+import asyncio
 import os
 import importlib
 from typing import Dict, Type, Optional, Tuple
 from pathlib import Path
 from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Import the protocol and post class
+# from social_media.auth_manager import AuthManager
 from logger_config import logger, console
 
 
@@ -10,8 +12,17 @@ class BotManager:
     # TODO: 5. 4. 2024: file_path to source
     def __init__(self, file_path: Path):
         self.file_path = file_path
+        # self.auth_manager = AuthManager(file_path.with_suffix('.json'))
         self.bot_instances: Dict[Tuple[str, str], SocialMediaProtocol] = {}
         self.platform_classes = self.load_platform_post_classes()
+
+        # Initialize AuthManager and load credentials
+        # loop = asyncio.get_event_loop()
+        # loop.run_until_complete(self.auth_manager.load_credentials())
+
+        # logger.debug(f"Loading auth data from {self.auth_manager.credentials_file_path}")
+        logger.debug(f"Loading platform post classes from {self.platform_classes}")
+        # logger.debug(f"Loaded auth data: {self.auth_manager.credentials}")
 
     def load_platform_post_classes(self) -> Dict[str, Type[SocialMediaProtocol]]:
         platform_classes = {}
