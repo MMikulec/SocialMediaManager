@@ -47,34 +47,6 @@ class BotManager:
                     platform_classes[module_name.lower()] = bot_class
         return platform_classes
 
-    """def refresh_platform_classes(self):
-        #Reloads the bot classes from the bots directory.
-        new_classes = self.load_platform_post_classes()
-        self.platform_classes.update(new_classes)  # Update existing dictionary with any new entries"""
-
-    """def load_bot(self, user_name: str, platform_name: str) -> Optional[SocialMediaProtocol]:
-        platform_name = platform_name.lower()  # Normalize to lowercase
-        # Adjusted to create a tuple key of user_name and platform_name
-        key = (user_name, platform_name)
-
-        if key not in self.bot_instances:
-            bot_class = self.platform_classes.get(platform_name)
-            if not bot_class:
-                self.refresh_platform_classes()
-                bot_class = self.platform_classes.get(platform_name)
-            if bot_class:
-                try:
-                    # Adjusted to pass user_name to the bot class constructor
-                    bot_instance = bot_class(user_name, self.file_path.name)
-                    self.bot_instances[key] = bot_instance
-                    logger.debug(f"Created new instance of {bot_class.__name__} for user {user_name}.")
-                    return bot_instance
-                except Exception as e:
-                    logger.error(f"Error instantiating bot for platform {platform_name} and user {user_name}: {e}")
-            else:
-                logger.error(f"No bot class found for platform: {platform_name}")
-        return self.bot_instances.get(key)"""
-
     def load_bot(self, user_name: str, platform_name: str) -> Optional[SocialMediaProtocol]:
         platform_name = platform_name.lower()
         bot_class = self._bot_classes.get(platform_name)

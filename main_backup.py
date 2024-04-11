@@ -17,27 +17,28 @@ def main():
 
     # TODO: 10. 4. 2024: Usage data_holder
     data_manager = DataHolder(excel_manager.df)
-    data_manager.set_data(log_manager.update_df_from_logs(data_manager.dataframe, only_today=False))
-    post_task_executor = PostExecutor(excel_file_path, data_manager)
+    data_manager.dataframe = log_manager.update_df_from_logs(data_manager.dataframe, only_today=False)
 
-    data_manager.display_dataframe_as_table(data_manager.load_current_date_posts(), "Today's posts")
+    # Update Excel with all available logs at start-up
+    excel_manager.df = log_manager.update_df_from_logs(excel_manager.df, only_today=False)
+    display_dataframe_as_table(excel_manager.load_current_date_posts(), "Today's posts")
+
+    # Initialize the scheduler and configure tasks using the TaskScheduler class
+    excel_task_scheduler = TaskScheduler()
+
+    # Initialize post executor and load current data
+    post_task_executor = PostExecutor(excel_file_path, excel_manager.load_current_date_posts())
     asyncio.run(post_task_executor.start())
 
-    # excel_task_scheduler = TaskScheduler()
-
-    """# Initialize post executor and load current data
-    post_task_executor = PostExecutor(excel_file_path, excel_manager.load_current_date_posts())
-    asyncio.run(post_task_executor.start())"""
-
-    """@excel_task_scheduler.job('cron', hour=23, minute=0, id='update_excel')
+    @excel_task_scheduler.job('cron', hour=23, minute=0, id='update_excel')
     def update_excel_from_logs():
-        # ""Updates the Excel file with today's logs and saves changes.""
+        """Updates the Excel file with today's logs and saves changes."""
         excel_manager.df = log_manager.update_df_from_logs(excel_manager.df, only_today=True)
         excel_manager.save_changes_to_excel()
 
     @excel_task_scheduler.job('cron', hour=1, minute=0, id='load_excel')
     def load_excel():
-        #""Loads today's posts from Excel and displays them.""
+        """Loads today's posts from Excel and displays them."""
         excel_manager.load_excel_data()
         display_dataframe_as_table(excel_manager.load_current_date_posts(), "Today's posts")
 
@@ -45,7 +46,7 @@ def main():
         asyncio.run(post_task_executor.start())
 
     excel_task_scheduler.start()
-    print(excel_task_scheduler.get_jobs())"""
+    print(excel_task_scheduler.get_jobs())
 
 
 if __name__ == "__main__":

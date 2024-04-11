@@ -2,6 +2,7 @@ import asyncio
 import pandas as pd
 from pathlib import Path
 from task_management.scheduling.async_task_scheduler import AsyncTaskScheduler
+from data_management.data_holder import DataHolder
 from social_media.bot_manager import BotManager
 from logger_config import logger, console
 from bot_manager.bot_core.errors import CredentialError
@@ -9,27 +10,34 @@ from bot_manager.bot_core.errors import CredentialError
 
 class PostExecutor:
     # TODO: 5. 4. 2024: file_path to source
-    def __init__(self, file_path: Path, dataframe: pd.DataFrame):
+    # TODO: 10. 4. 2024: dataframe to DataHolder
+    def __init__(self, file_path: Path, data_holder: DataHolder):
         """
         Initializes the PostExecutor with necessary attributes.
 
-        :param file_path: The name of the Excel file to use for bot management.
+        :param file_path: The path to the Excel file used for bot management.
+        :param data_holder: The container holding the DataFrame of posts.
         """
         self.bot_manager = BotManager(file_path)
         self.task_scheduler = AsyncTaskScheduler()
-        self.df = dataframe
+
+        self.data_holder = data_holder
+        self.current_df = self.data_holder.load_current_date_posts()
+
         # Track running tasks
         self.running_tasks = {}
 
-    def update_executor(self, new_file_name: Path, new_dataframe: pd.DataFrame):
+    def update_executor(self, new_file_name: Path, new_data_holder: DataHolder):
         """
         Updates the PostExecutor with new attributes and re-initializes the AsyncTaskScheduler.
 
         :param new_file_name: The new name of the Excel file to use for bot management.
-        :param new_dataframe: The new DataFrame containing the posts data.
+        :param  new_data_holder: The new DataHolder containing the updated DataFrame.
         """
         self.bot_manager = BotManager(new_file_name)
-        self.df = new_dataframe
+
+        self.data_holder = new_data_holder
+        self.current_df = self.data_holder.load_current_date_posts()
         self.task_scheduler = AsyncTaskScheduler()
         self.running_tasks = {}
 
@@ -50,6 +58,8 @@ class PostExecutor:
             # Handle keyboard interrupt if needed
             pass
         finally:
+            # Update data_holder with new data
+            self.data_holder.update_data(self.current_df)
             # Stop the task scheduler
             self.task_scheduler.shutdown()
 
@@ -61,7 +71,7 @@ class PostExecutor:
         Only posts with a 'Scheduled' status are queued for posting.
         """
         # Iterate through the DataFrame rows
-        for index, row in self.df.iterrows():
+        for index, row in self.current_df.iterrows():
 
             # Schedule each post based on the DataFrame's information
             scheduled_time = row['Scheduled Time']  # Updated to correct column name
