@@ -11,14 +11,14 @@ from bot_manager.bot_core.errors import CredentialError
 class PostExecutor:
     # TODO: 5. 4. 2024: file_path to source
     # TODO: 10. 4. 2024: dataframe to DataHolder
-    def __init__(self, file_path: Path, data_holder: DataHolder):
+    def __init__(self, data_holder: DataHolder):
         """
         Initializes the PostExecutor with necessary attributes.
 
         :param file_path: The path to the Excel file used for bot management.
         :param data_holder: The container holding the DataFrame of posts.
         """
-        self.bot_manager = BotManager(file_path)
+        self.bot_manager = BotManager(data_holder)
         self.task_scheduler = AsyncTaskScheduler()
 
         self.data_holder = data_holder
@@ -27,18 +27,19 @@ class PostExecutor:
         # Track running tasks
         self.running_tasks = {}
 
-    def update_executor(self, new_file_name: Path, new_data_holder: DataHolder):
+    def update_executor(self, new_data_holder: DataHolder):
         """
         Updates the PostExecutor with new attributes and re-initializes the AsyncTaskScheduler.
 
         :param new_file_name: The new name of the Excel file to use for bot management.
         :param  new_data_holder: The new DataHolder containing the updated DataFrame.
         """
-        self.bot_manager = BotManager(new_file_name)
+        self.bot_manager = BotManager(new_data_holder)
+        self.task_scheduler = AsyncTaskScheduler()
 
         self.data_holder = new_data_holder
         self.current_df = self.data_holder.load_current_date_posts()
-        self.task_scheduler = AsyncTaskScheduler()
+
         self.running_tasks = {}
 
     async def start(self):

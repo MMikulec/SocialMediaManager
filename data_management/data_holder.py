@@ -36,6 +36,8 @@ class DataHolder:
         """
         Updates the DataFrame with new data. This method can be tailored to handle
         different types of updates depending on how `new_data` is structured.
+
+        :param new_data: The new DataFrame to replace the old one.
         """
         self.dataframe.update(new_data)
 

@@ -29,8 +29,8 @@ async def test_post_executor_start(num_posts):
         'User Name': generate_user_names(num_posts)
     })
 
-    data_holder = DataHolder(posts_df)
-    post_executor = PostExecutor(Path('post_executor_test.xlsx'), data_holder)
+    data_holder = DataHolder(posts_df, Path('post_executor_test.xlsx').name)
+    post_executor = PostExecutor(data_holder)
     await post_executor.start()
 
     # Assertions to validate behavior; modify as needed based on actual outcomes and requirements
@@ -74,8 +74,8 @@ async def test_post_executor_users(num_posts):
         'User Name': user_names
     })
 
-    data_holder = DataHolder(posts_df)
-    post_executor = PostExecutor(Path('post_executor_test.xlsx'), data_holder)
+    data_holder = DataHolder(posts_df, Path('post_executor_test.xlsx').name)
+    post_executor = PostExecutor(data_holder)
     await post_executor.start()
 
     # Additional assertions can be added here

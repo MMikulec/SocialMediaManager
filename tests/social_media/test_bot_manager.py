@@ -1,8 +1,11 @@
 #  Copyright (c) 2024.
 import pytest
 from pathlib import Path
+import pandas as pd
 from social_media.bot_manager import BotManager  # Assuming BotManager is in this location
 from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Adjust if necessary
+from data_management.data_holder import DataHolder
+from datetime import datetime, timedelta
 
 
 def test_bot_loading():
@@ -10,7 +13,18 @@ def test_bot_loading():
     Test if BotManager correctly loads and instantiates bots based on platform names.
     """
     # Initialize the BotManager
-    bot_manager = BotManager(Path("../plan.xlsx"))
+    df = pd.DataFrame({
+        'Post ID': [1, 2, 3],
+        'Platform': ['Instagram', 'Facebook', 'Instagram'],
+        'Content': ['Check out our new product', 'New product launch', 'Product giveaway'],
+        'Image Path': ['img1', 'img1', 'img1'],
+        'Hashtags': ['#new #tech #insta', '#new #tech #fcbk', '#new #tech #insta'],
+        'Scheduled Time': [datetime.now() + timedelta(days=1), datetime.now(), datetime.now() - timedelta(days=1)],
+        'Status': ['Scheduled', 'Scheduled', 'Posted'],
+        'Remarks': ['', '', '']
+    })
+
+    bot_manager = BotManager(DataHolder(df, "plan_post.xlsx"))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
     bot_instance = bot_manager.load_bot("default", 'facebook')
@@ -28,10 +42,24 @@ def test_bots_loading():
     """
     Test if BotManager correctly loads and instantiates bots based on platform names.
     """
+
+
     # Initialize the BotManager
-    bot_manager = BotManager(Path("../plan.xlsx"))
-    bot_manager2 = BotManager(Path("../plan2.xlsx"))
-    bot_manager3 = BotManager(Path("../plan3.xlsx"))
+    # Initialize the BotManager
+    df = pd.DataFrame({
+        'Post ID': [1, 2, 3],
+        'Platform': ['Instagram', 'Facebook', 'Instagram'],
+        'Content': ['Check out our new product', 'New product launch', 'Product giveaway'],
+        'Image Path': ['img1', 'img1', 'img1'],
+        'Hashtags': ['#new #tech #insta', '#new #tech #fcbk', '#new #tech #insta'],
+        'Scheduled Time': [datetime.now() + timedelta(days=1), datetime.now(), datetime.now() - timedelta(days=1)],
+        'Status': ['Scheduled', 'Scheduled', 'Posted'],
+        'Remarks': ['', '', '']
+    })
+
+    bot_manager = BotManager(DataHolder(df, "plan_post.xlsx"))
+    bot_manager2 = BotManager(DataHolder(df, "plan_post2.xlsx"))
+    bot_manager3 = BotManager(DataHolder(df, "plan_post3.xlsx"))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
     bot_instance = bot_manager.load_bot("default", 'facebook')

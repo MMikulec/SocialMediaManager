@@ -16,9 +16,9 @@ def main():
     log_manager = LogDataManager(log_file_path)
 
     # TODO: 10. 4. 2024: Usage data_holder
-    data_manager = DataHolder(excel_manager.df)
+    data_manager = DataHolder(dataframe=excel_manager.df, data_source=excel_file_path.name)
     data_manager.set_data(log_manager.update_df_from_logs(data_manager.dataframe, only_today=False))
-    post_task_executor = PostExecutor(excel_file_path, data_manager)
+    post_task_executor = PostExecutor(data_manager)
 
     data_manager.display_dataframe_as_table(data_manager.load_current_date_posts(), "Today's posts")
     asyncio.run(post_task_executor.start())

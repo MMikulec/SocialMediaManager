@@ -4,6 +4,7 @@ import importlib
 from typing import Dict, Type, Optional, Tuple
 from pathlib import Path
 from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Import the protocol and post class
+from data_management.data_holder import DataHolder
 # from social_media.auth_manager import AuthManager
 from logger_config import logger, console
 
@@ -19,8 +20,8 @@ class BotManager:
             return bot_cls
         return decorator
 
-    def __init__(self, file_path: Path):
-        self.file_path = file_path
+    def __init__(self, data_holder: DataHolder):  #file_path: Path):
+        self.source = data_holder.data_source
         # self.auth_manager = AuthManager(file_path.with_suffix('.json'))
         self.bot_instances: Dict[Tuple[str, str], SocialMediaProtocol] = {}
         self.platform_classes = self.load_platform_post_classes()
@@ -59,7 +60,7 @@ class BotManager:
         key = (platform_name, user_name.lower())
         if key not in self.bot_instances:
             try:
-                bot_instance = bot_class(user_name, self.file_path)
+                bot_instance = bot_class(user_name, self.source)
                 self.bot_instances[key] = bot_instance
                 logger.debug(
                     f"Created new instance of {bot_class.__name__} for user {user_name} on platform {platform_name}.")
