@@ -11,12 +11,16 @@ from social_media import PostExecutor
 def main():
     excel_file_path = Path("plan.xlsx")
     log_file_path = Path(f'bot_manager/logs/{excel_file_path.stem}_posts.log')
+    credential_source = Path('credentials.json').name
 
     excel_manager = ExcelDataManager(excel_file_path)
     log_manager = LogDataManager(log_file_path)
 
     # TODO: 10. 4. 2024: Usage data_holder
-    data_manager = DataHolder(dataframe=excel_manager.df, data_source=excel_file_path.name)
+    data_manager = DataHolder(dataframe=excel_manager.df,
+                              data_source=excel_file_path.name,
+                              credential_source=credential_source)
+
     data_manager.set_data(log_manager.update_df_from_logs(data_manager.dataframe, only_today=False))
     post_task_executor = PostExecutor(data_manager)
 

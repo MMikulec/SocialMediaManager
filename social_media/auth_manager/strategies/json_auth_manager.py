@@ -1,50 +1,43 @@
 # json_auth_manager.py
 from pathlib import Path
 from typing import Optional, Dict, List
-
-from social_media.auth_manager.auth_manager_base import AbstractAuthManager
-import aiofiles
 import json
 
+from social_media.auth_manager.auth_manager_base import AbstractAuthManager
 from social_media.auth_manager.auth_manager import AuthManager
 
 
 @AuthManager.register_auth_strategy('json')
 class JSONAuthManager(AbstractAuthManager):
-    def __init__(self, credentials_file_path: Path):
+    def __init__(self, credentials_file_path: str):
         self.credentials_file_path = credentials_file_path
-        # Note: We have to change how we initially load credentials since __init__ can't be async
-        # We'll call load_credentials outside the __init__ to handle this.
         self.credentials = {}
+        self.load_credentials()  # Load credentials synchronously during initialization
 
-    async def load_credentials(self) -> Dict[str, Dict]:
-        """Load credentials from the JSON file asynchronously."""
-        if not self.credentials_file_path.exists():
+    def load_credentials(self) -> Dict[str, Dict]:
+        """Load credentials from the JSON file synchronously."""
+        if not Path(self.credentials_file_path).exists():
             raise FileNotFoundError(f"Credentials file not found: {self.credentials_file_path}")
-        async with aiofiles.open(self.credentials_file_path, 'r') as file:
-            content = await file.read()
-            self.credentials = json.loads(content)
-            return self.credentials
 
-    def get_credentials(self, platform_name: str, user_name: str = 'default'):
-        """Retrieve credentials for a specific user and platform, or the first user if 'default' or not specified."""
+        with open(self.credentials_file_path, 'r') as file:
+            self.credentials = json.load(file)
+        return self.credentials
+
+    def get_credentials(self, platform_name: str, user_name: str = 'default') -> Optional[Dict]:
+        """Retrieve credentials for a specific user and platform."""
         platform_credentials = self.credentials.get(platform_name.lower(), [])
 
-        # Handle 'default' user_name by returning the first user's credentials for the platform
         if user_name == 'default' or not user_name:
             return platform_credentials[0] if platform_credentials else None
 
-        # If a specific user_name is provided, search for that user's credentials
         for user_credentials in platform_credentials:
             if user_credentials.get("user_name") == user_name:
                 return user_credentials
 
-        # If the user_name is provided but not found, you might want to handle this case, e.g., by returning None
-        # or raising an exception. For simplicity, here we return None.
         return None
 
-    async def update_credentials(self, platform_name: str, user_name: str, new_credentials: Dict):
-        """Update credentials for a specific user and platform asynchronously."""
+    def update_credentials(self, platform_name: str, user_name: str, new_credentials: Dict):
+        """Update credentials for a specific user and platform synchronously."""
         platform_credentials = self.credentials.get(platform_name.lower(), [])
         for user_credentials in platform_credentials:
             if user_credentials.get("user_name") == user_name:
@@ -53,12 +46,13 @@ class JSONAuthManager(AbstractAuthManager):
         else:  # User not found, add new credentials
             platform_credentials.append({"user_name": user_name, **new_credentials})
             self.credentials[platform_name.lower()] = platform_credentials
-        await self.save_credentials()  # Save asynchronously
 
-    async def save_credentials(self):
-        """Save the updated credentials back to the JSON file asynchronously."""
-        async with aiofiles.open(self.credentials_file_path, 'w') as file:
-            await file.write(json.dumps(self.credentials, indent=4))
+        self.save_credentials()  # Save synchronously
+
+    def save_credentials(self):
+        """Save the updated credentials back to the JSON file synchronously."""
+        with open(self.credentials_file_path, 'w') as file:
+            json.dump(self.credentials, file, indent=4)
 
     def list_users(self, platform_name: str) -> List[str]:
         """List all users for a given platform."""

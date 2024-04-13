@@ -24,7 +24,7 @@ def test_bot_loading():
         'Remarks': ['', '', '']
     })
 
-    bot_manager = BotManager(DataHolder(df, "plan_post.xlsx"))
+    bot_manager = BotManager(DataHolder(df, "plan_post.xlsx", "plan_post.json"))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
     bot_instance = bot_manager.load_bot("default", 'facebook')
@@ -57,9 +57,9 @@ def test_bots_loading():
         'Remarks': ['', '', '']
     })
 
-    bot_manager = BotManager(DataHolder(df, "plan_post.xlsx"))
-    bot_manager2 = BotManager(DataHolder(df, "plan_post2.xlsx"))
-    bot_manager3 = BotManager(DataHolder(df, "plan_post3.xlsx"))
+    bot_manager = BotManager(DataHolder(df, "plan_post.xlsx", "plan_post.json"))
+    bot_manager2 = BotManager(DataHolder(df, "plan_post2.xlsx", "plan_post.json"))
+    bot_manager3 = BotManager(DataHolder(df, "plan_post3.xlsx", "plan_post.json"))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
     bot_instance = bot_manager.load_bot("default", 'facebook')

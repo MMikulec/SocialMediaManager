@@ -1,8 +1,10 @@
 from datetime import datetime
+import re
 
 import pandas as pd
 from rich.console import Console
 from rich.table import Table
+from logger_config import logger, console
 
 
 class DataHolder:
@@ -13,9 +15,10 @@ class DataHolder:
     """
 
     # TODO: 11. 4. 2024: New variable for data source. It can replace file_path!
-    def __init__(self, dataframe: pd.DataFrame, data_source=None):
+    def __init__(self, dataframe: pd.DataFrame, data_source=None, credential_source=None):
         self.dataframe = dataframe
         self.data_source = data_source
+        self.credential_source = credential_source
         self.date_column = 'Scheduled Time'
 
     def get_data(self):
@@ -48,6 +51,24 @@ class DataHolder:
         except Exception as e:
             print(f"Error loading current date posts: {e}")
             return pd.DataFrame()
+
+    @staticmethod
+    def check_credentials_source(source):
+        # Regular expression to match a string ending with a file extension
+        file_match = re.search(r'\.([a-zA-Z0-9]+)$', source)
+
+        if file_match:
+            logger.info(f"It's a file with extension {file_match.group(1)}")
+            return file_match.group(1)
+
+        # Check for a pattern that might represent a database connection string
+        elif re.search(r'^\w+:\/\/', source):
+            logger.info(f"It's a database connection string")
+            return "database"
+
+        # Default case if the source is neither recognized as a file nor as a database connection string
+        else:
+            raise ValueError("The source type is unknown or not supported.")
 
     @staticmethod
     def display_dataframe_as_table(dataframe: pd.DataFrame, title: str):

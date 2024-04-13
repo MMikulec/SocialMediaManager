@@ -1,11 +1,14 @@
 # social_media/auth_manager/auth_manager.py
 import importlib
 from pathlib import Path
-from .auth_manager_base import AbstractAuthManager
+from social_media.auth_manager.auth_manager_base import AbstractAuthManager
 
 
 class AuthManager:
     _auth_strategies = {}  # Class-level registry for auth strategies
+
+    def __init__(self):
+        self.load_builtin_strategies()  # Ensure strategies are loaded and registered
 
     @classmethod
     def register_auth_strategy(cls, name):
@@ -26,14 +29,10 @@ class AuthManager:
                 importlib.import_module(module_path)
         # No need to manually fill _auth_strategies here, as strategies register themselves via decorator
 
-    def __init__(self):
-        self.load_builtin_strategies()  # Ensure strategies are loaded and registered
-
     @classmethod
-    def get_strategy_instance(self, strategy_name: str, *args, **kwargs):
+    def get_strategy_instance(cls, strategy_name: str, *args, **kwargs):
         """Instantiate and return an auth strategy instance by its name."""
-        strategy_class = self._auth_strategies.get(strategy_name)
+        strategy_class = cls._auth_strategies.get(strategy_name)
         if not strategy_class:
             raise ValueError(f"No authentication strategy found for name: {strategy_name}")
         return strategy_class(*args, **kwargs)
-

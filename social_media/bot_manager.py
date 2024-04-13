@@ -7,32 +7,51 @@ from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Im
 from data_management.data_holder import DataHolder
 # from social_media.auth_manager import AuthManager
 from logger_config import logger, console
+from social_media.auth_manager.auth_manager import AuthManager
+from task_management import data_manager
+from social_media.auth_manager.auth_manager_base import AuthManagerProtocol
 
 
 class BotManager:
     # TODO: 5. 4. 2024: file_path to source
     _bot_classes = {}  # Registry keyed by platform name
 
+    def __init__(self, data_holder: DataHolder):
+        self.data_holder = data_holder
+        self.source = data_holder.data_source
+        self.credential_source = data_holder.credential_source
+
+        self.bot_instances: Dict[Tuple[str, str], SocialMediaProtocol] = {}
+        self.platform_classes = self.load_platform_post_classes()
+
+        self.auth_strategy = self.get_auth_strategy()  # Store the auth strategy instance directly
+
+        # logger.debug(f"Loading auth data from {cls.auth_manager.credentials_file_path}")
+        logger.debug(f"Loading platform post classes from {self.platform_classes}")
+        # logger.debug(f"Loaded auth data: {cls.auth_manager.credentials}")
+
     @classmethod
     def register_bot(cls, platform_name):
         def decorator(bot_cls):
             cls._bot_classes[platform_name.lower()] = bot_cls
             return bot_cls
+
         return decorator
 
-    def __init__(self, data_holder: DataHolder):  #file_path: Path):
-        self.source = data_holder.data_source
-        # self.auth_manager = AuthManager(file_path.with_suffix('.json'))
-        self.bot_instances: Dict[Tuple[str, str], SocialMediaProtocol] = {}
-        self.platform_classes = self.load_platform_post_classes()
+    def get_auth_strategy(self) -> AuthManagerProtocol:
+        """
+        Creates an AuthManager instance, determines the type of credentials source,
+        and retrieves the appropriate authentication strategy.
 
-        # Initialize AuthManager and load credentials
-        # loop = asyncio.get_event_loop()
-        # loop.run_until_complete(self.auth_manager.load_credentials())
+        :return: An instance of the relevant AuthStrategy class.
+        """
+        auth_manager = AuthManager()
+        credentials_type = self.data_holder.check_credentials_source(self.credential_source)
 
-        # logger.debug(f"Loading auth data from {self.auth_manager.credentials_file_path}")
-        logger.debug(f"Loading platform post classes from {self.platform_classes}")
-        # logger.debug(f"Loaded auth data: {self.auth_manager.credentials}")
+        strategy_instance = auth_manager.get_strategy_instance(credentials_type, self.credential_source)
+        if not strategy_instance:
+            raise ValueError(f"No strategy found for credentials type: {credentials_type}")
+        return strategy_instance
 
     def load_platform_post_classes(self) -> Dict[str, Type[SocialMediaProtocol]]:
         platform_classes = {}
@@ -69,4 +88,3 @@ class BotManager:
                 return None
 
         return self.bot_instances[key]
-
