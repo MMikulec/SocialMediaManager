@@ -19,7 +19,64 @@ class DataHolder:
         self.dataframe = dataframe
         self.data_source = data_source
         self.credential_source = credential_source
-        self.date_column = 'Scheduled Time'
+
+        # Define column names as attributes
+        self.post_id_column = "Post ID"
+        self.platform_column = "Platform"
+        self.content_column = "Content"
+        self.image_path_column = "Image Path"
+        self.hashtags_column = "Hashtags"
+        self.scheduled_time_column = "Scheduled Time"
+        self.status_column = "Status"
+        self.user_name_column = "User Name"
+
+        self.validate_data()
+
+    def validate_data(self):
+        """Validates the DataFrame for mandatory columns, unique, and non-empty constraints."""
+        self.check_mandatory_columns()
+        self.check_unique_conditions()
+        self.check_non_empty_conditions()
+
+    def check_mandatory_columns(self):
+        """
+        Ensures all predefined columns are present in the DataFrame.
+
+        Raises:
+        ValueError: If any mandatory column is missing.
+        """
+        mandatory_columns = [
+            self.post_id_column, self.platform_column, self.content_column,
+            self.image_path_column, self.hashtags_column, self.scheduled_time_column,
+            self.status_column, self.user_name_column
+        ]
+
+        missing_columns = [col for col in mandatory_columns if col not in self.dataframe.columns]
+        if missing_columns:
+            raise ValueError(f"Missing mandatory columns: {', '.join(missing_columns)}")
+
+    def check_unique_conditions(self):
+        """
+        Ensures that values in the 'Post ID' column are unique.
+
+        Raises:
+        ValueError: If 'Post ID' values are not unique.
+        """
+        if self.dataframe[self.post_id_column].duplicated().any():
+            raise ValueError(f"Values in column '{self.post_id_column}' must be unique.")
+
+    def check_non_empty_conditions(self):
+        """
+        Ensures that certain columns do not contain empty values.
+
+        Raises:
+        ValueError: If specified columns contain empty values.
+        """
+        non_empty_columns = [self.user_name_column]  # Add more columns if needed
+
+        for column in non_empty_columns:
+            if self.dataframe[column].isnull().any() or self.dataframe[column].eq('').any():
+                raise ValueError(f"Column '{column}' cannot contain empty values.")
 
     def get_data(self):
         """
@@ -47,7 +104,7 @@ class DataHolder:
     def load_current_date_posts(self):
         try:
             current_date = datetime.now().date()
-            return self.dataframe[self.dataframe[self.date_column].dt.date == current_date]
+            return self.dataframe[self.dataframe[self.scheduled_time_column].dt.date == current_date]
         except Exception as e:
             print(f"Error loading current date posts: {e}")
             return pd.DataFrame()

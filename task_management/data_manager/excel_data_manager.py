@@ -35,13 +35,6 @@ class ExcelDataManager:
         try:
             self.df = pd.read_excel(self.excel_file_path, sheet_name=self.sheet_name)
 
-            # Ensure 'User Name' column exists, fill empty values with 'default'
-            if 'User Name' in self.df.columns:
-                self.df['User Name'] = self.df['User Name'].fillna('default')
-            else:
-                # If 'User Name' column doesn't exist, add it with 'default' for all rows
-                self.df['User Name'] = 'default'
-
         except Exception as e:
             # Consider logging the error instead of printing to handle it properly.
             print(f"Error loading Excel data: {e}")
