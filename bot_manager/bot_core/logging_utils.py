@@ -8,16 +8,16 @@ from config import LOGGING_CONFIG
 from logger_config import logger
 
 
-def setup_bot_logs(excel_file_name):
-    """Set up a logs for a specific Excel file."""
+def setup_bot_logs(source_name):
+    """Set up a logs for a specific source file."""
     logs_dir = 'bot_manager/logs'
-    excel_base_name = os.path.splitext(os.path.basename(excel_file_name))[0]
-    log_file = f'{logs_dir}/{excel_base_name}_posts.log'
+    source_base_name = os.path.splitext(os.path.basename(source_name))[0]
+    log_file = f'{logs_dir}/{source_base_name}_posts.log'
 
     if not os.path.exists(logs_dir):
         os.makedirs(logs_dir)
 
-    logs = logging.getLogger(excel_base_name)
+    logs = logging.getLogger(source_base_name)
     logs.setLevel(LOGGING_CONFIG["bots_log_level"])
     logs.propagate = False
 
@@ -78,7 +78,7 @@ class ContextualLogger(logging.LoggerAdapter):
         Returns:
             Tuple[str, Dict[str, Any]]: The modified log message and keyword arguments.
         """
-        excel_file = self.extra.get("excel_file")
+        excel_file = self.extra.get("source_file")
         platform_name = self.extra.get("platform_name")
 
         # Check for missing 'excel_file' or 'platform_name' and log a debug message if any are missing
@@ -109,11 +109,11 @@ class LoggerSingleton:
     _lock = threading.Lock()  # Class-level lock
 
     @classmethod
-    def get_logger(cls, excel_file_name, platform_name):
-        key = (excel_file_name, platform_name)
+    def get_logger(cls, source_name, platform_name):
+        key = (source_name, platform_name)
         with cls._lock:  # Ensure thread-safe access and creation of loggers
             if key not in cls._instances:
-                base_logger = setup_bot_logs(excel_file_name)
-                contextual_logger = ContextualLogger(base_logger, {'excel_file': excel_file_name, 'platform_name': platform_name})
+                base_logger = setup_bot_logs(source_name)
+                contextual_logger = ContextualLogger(base_logger, {'source_file': source_name, 'platform_name': platform_name})
                 cls._instances[key] = contextual_logger
             return cls._instances[key]

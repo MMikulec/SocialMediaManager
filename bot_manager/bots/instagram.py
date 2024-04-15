@@ -5,10 +5,10 @@ import pandas as pd
 from typing import Tuple, Optional, Any, TypeAlias
 
 from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger
-from bot_manager.bot_core.posts import SocialMediaPost
-from bot_manager.bot_core.bots import SocialMediaBot
+from bot_manager.bot_core.media import MediaContent
+from bot_manager.bot_core.bots import AbstractBot
 from bot_manager.bot_core.utils import auto_log
-from bot_manager.bot_core.authenticator import PlatformAuthenticator
+from bot_manager.bot_core.authenticator import AbstractAuthenticator
 from bot_manager.bot_core import LogType
 from logger_config import logger, console
 from dataclasses import dataclass, asdict
@@ -20,11 +20,11 @@ import time
 
 
 @dataclass
-class InstagramPost(SocialMediaPost):
+class InstagramContent(MediaContent):
     reel: str = None  # Facebook specific attribute
 
     @classmethod
-    def from_dataframe_row(cls, row: pd.Series) -> 'InstagramPost':
+    def from_dataframe_row(cls, row: pd.Series) -> 'InstagramContent':
         """
         Overrides the factory method to include Facebook-specific data.
         """
@@ -38,7 +38,7 @@ class InstagramPost(SocialMediaPost):
         return cls(**base_post_dict)
 
 
-class PlatformAuthenticatorInstagram(PlatformAuthenticator):
+class AuthenticatorInstagram(AbstractAuthenticator):
     def login(self):
         # Instagram-specific login logic
         print("Instagram login")
@@ -51,18 +51,18 @@ class PlatformAuthenticatorInstagram(PlatformAuthenticator):
 
 
 @BotManager.register_bot(platform_name='instagram')
-class InstagramBot(SocialMediaBot):
+class InstagramBot(AbstractBot):
     platform_name = property(lambda self: "Instagram")
 
     def create_auth_manager(self, api_key, api_secret):
-        return PlatformAuthenticatorInstagram(api_key, api_secret)
+        return AuthenticatorInstagram(api_key, api_secret)
 
-    def create_post_from_dataframe_row(self, row: pd.Series) -> InstagramPost:
-        instagram_post = InstagramPost.from_dataframe_row(row)
+    def create_post_from_dataframe_row(self, row: pd.Series) -> InstagramContent:
+        instagram_post = InstagramContent.from_dataframe_row(row)
         return instagram_post
 
     @auto_log
-    async def post(self, post: InstagramPost) -> LogType:
+    async def post(self, post: InstagramContent) -> LogType:
 
         # Simulate the request operation
         logger.debug(f"Posting {post}...")

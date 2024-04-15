@@ -5,17 +5,17 @@ from typing import Protocol, runtime_checkable
 
 from logger_config import logger, console
 from bot_manager.bot_core import LogType
-from bot_manager.bot_core.authenticator import PlatformAuthenticator
+from bot_manager.bot_core.authenticator import AbstractAuthenticator
 from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger, LoggerSingleton
-from bot_manager.bot_core.posts import SocialMediaPost
+from bot_manager.bot_core.media import MediaContent
 from bot_manager.bot_core.singleton import SingletonMeta, UserBasedSingletonMeta
 
 
 @runtime_checkable
-class SocialMediaProtocol(Protocol):
+class BotProtocol(Protocol):
     """
     A protocol for social media bots. Implementing classes are expected to accept
-    an 'source_name' parameter in their constructor for initializing with a specific Excel file.
+    an 'source_name' parameter in their constructor for initializing with a specific source file.
     """
 
     def __init__(self, user_name: str, source_name: str, credentials: dict):
@@ -23,25 +23,25 @@ class SocialMediaProtocol(Protocol):
         self.source_name = source_name
         self.credentials = credentials
 
-    def post(self, post: SocialMediaPost) -> LogType: ...
+    def post(self, post: MediaContent) -> LogType: ...
 
-    def create_post_from_dataframe_row(self, row: pd.Series) -> SocialMediaPost: ...
+    def create_post_from_dataframe_row(self, row: pd.Series) -> MediaContent: ...
 
 
-class SocialMediaBot(ABC, metaclass=UserBasedSingletonMeta):
+class AbstractBot(ABC, metaclass=UserBasedSingletonMeta):
     """
     Abstract base class for social media bots responsible for posting content.
 
     Attributes:
         logs (ContextualLogger): Logger for recording bot activities, configured per bot instance.
-        auth_manager (bot_manager.bot_core.authenticator.PlatformAuthenticator): Authentication manager instance for handling API authentication.
+        auth_manager (bot_manager.bot_core.authenticator.AbstractAuthenticator): Authentication manager instance for handling API authentication.
     """
 
     def __init__(self, user_name, source_name: str, credentials: dict):
         """
-        Initializes the social media bot with a specific Excel file context.
+        Initializes the social media bot with a specific source file context.
 
-        :param source_name: The name of the Excel file used for sourcing post data.
+        :param source_name: The name of the source file used for sourcing post data.
         """
         """base_logger = setup_bot_logs(source_name)
         self.logs = ContextualLogger(base_logger,
@@ -67,7 +67,7 @@ class SocialMediaBot(ABC, metaclass=UserBasedSingletonMeta):
         pass
 
     @abstractmethod
-    def create_auth_manager(self, api_key: str, api_secret: str) -> PlatformAuthenticator:
+    def create_auth_manager(self, api_key: str, api_secret: str) -> AbstractAuthenticator:
         """
         Factory method to create an AuthManager instance specific to the social media platform.
 
@@ -76,25 +76,25 @@ class SocialMediaBot(ABC, metaclass=UserBasedSingletonMeta):
             api_secret (str): API secret for secure authentication.
 
         Returns:
-            PlatformAuthenticator: An instance of AuthManager for handling authentication.
+            AbstractAuthenticator: An instance of AuthManager for handling authentication.
         """
         pass
 
     @abstractmethod
-    def create_post_from_dataframe_row(self, row: pd.Series) -> SocialMediaPost:
+    def create_post_from_dataframe_row(self, row: pd.Series) -> MediaContent:
         pass
 
     @abstractmethod
-    def post(self, post: SocialMediaPost) -> LogType:
+    def post(self, post: MediaContent) -> LogType:
         """
         Abstract method for posting content to the social media platform. Must be implemented by subclasses.
 
         Args:
-            post (SocialMediaPost): The post object containing content to be shared.
+            post (MediaContent): The post object containing content to be shared.
         """
         pass
 
-    def log_post(self, post: SocialMediaPost, level, message, data=None):
+    def log_post(self, post: MediaContent, level, message, data=None):
         """
         Logs actions related to a social media post, incorporating the post's ID into the logging context for
         enhanced traceability.

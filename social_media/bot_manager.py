@@ -1,7 +1,7 @@
 import importlib
 from typing import Dict, Type, Optional, Tuple
 from pathlib import Path
-from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Import the protocol and post class
+from bot_manager.bot_core.bots import BotProtocol, MediaContent  # Import the protocol and post class
 from data_management.data_holder import DataHolder
 from logger_config import logger, console
 from social_media.auth_manager.auth_manager import AuthManager
@@ -10,14 +10,14 @@ from social_media.auth_manager.auth_manager_base import AuthManagerProtocol
 
 class BotManager:
     # TODO: 5. 4. 2024: file_path to source
-    _bot_classes: Dict[str, Type[SocialMediaProtocol]] = {}  # Registry keyed by platform name
+    _bot_classes: Dict[str, Type[BotProtocol]] = {}  # Registry keyed by platform name
 
     def __init__(self, data_holder: DataHolder):
         self.data_holder = data_holder
         self.source = data_holder.data_source
         self.credential_source = data_holder.credential_source
 
-        self.bot_instances: Dict[Tuple[str, str], SocialMediaProtocol] = {}
+        self.bot_instances: Dict[Tuple[str, str], BotProtocol] = {}
         self.platform_classes = self.load_platform_post_classes()
 
         self.auth_strategy = self.get_auth_strategy()  # Store the auth strategy instance directly
@@ -49,7 +49,7 @@ class BotManager:
             raise ValueError(f"No strategy found for credentials type: {credentials_type}")
         return strategy_instance
 
-    def load_platform_post_classes(self) -> Dict[str, Type[SocialMediaProtocol]]:
+    def load_platform_post_classes(self) -> Dict[str, Type[BotProtocol]]:
         platform_classes = {}
         # Assuming your bots.py file is in the correct location relative to this file
         bots_dir = Path(__file__).parent.parent / 'bot_manager' / 'bots'
@@ -59,11 +59,11 @@ class BotManager:
                 module = importlib.import_module(f'bot_manager.bots.{module_name}')
                 class_name = module_name.capitalize() + 'Bot'  # Construct the class name based on file name
                 bot_class = getattr(module, class_name, None)
-                if bot_class and issubclass(bot_class, SocialMediaProtocol):
+                if bot_class and issubclass(bot_class, BotProtocol):
                     platform_classes[module_name.lower()] = bot_class
         return platform_classes
 
-    def load_bot(self, user_name: str, platform_name: str) -> Optional[SocialMediaProtocol]:
+    def load_bot(self, user_name: str, platform_name: str) -> Optional[BotProtocol]:
         platform_name = platform_name.lower()
         bot_class = self._bot_classes.get(platform_name)
 

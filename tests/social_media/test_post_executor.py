@@ -1,5 +1,4 @@
-#  Copyright (c) 2024.
-
+import json
 import pytest
 import pandas as pd
 from datetime import datetime, timedelta
@@ -8,11 +7,20 @@ from pathlib import Path
 from social_media.post_executor import PostExecutor
 from data_management.data_holder import DataHolder
 
+# Sample data for use in tests
+credentials_data = {
+    "facebook": [{"user_name": "testuser1", "api_key": "testkey1"},
+                 {"user_name": "testuser2", "api_key": "testkey2"}],
+    "instagram": [{"user_name": "instauser", "access_token": "instatoken"}]
+}
+
+credentials_json = json.dumps(credentials_data)
+
 
 # Parameterize the test function to accept different numbers of posts
 @pytest.mark.asyncio  # This decorator is used for async tests with pytest-asyncio
 @pytest.mark.parametrize("num_posts", [3, 5, 10, 100])
-async def test_post_executor_start(num_posts):
+async def test_post_executor_start(num_posts, tmp_path):
     platforms = ['Instagram', 'Facebook', 'Instagram'] * (num_posts // 3) + ['Instagram', 'Facebook', 'Instagram'][
                                                                             :num_posts % 3]
     scheduled_times = [datetime.now() for _ in range(num_posts)]
@@ -29,7 +37,10 @@ async def test_post_executor_start(num_posts):
         'User Name': generate_user_names(num_posts)
     })
 
-    data_holder = DataHolder(posts_df, Path('post_executor_test.xlsx').name)
+    credentials_file = tmp_path / "credentials.json"
+    credentials_file.write_text(credentials_json)
+
+    data_holder = DataHolder(posts_df, Path('post_executor_test.xlsx').name, str(credentials_file))
     post_executor = PostExecutor(data_holder)
     await post_executor.start()
 
@@ -52,30 +63,3 @@ def generate_user_names(num_posts, cycle_users=None):
     if cycle_users is None:
         cycle_users = ['default', 'user1', 'user2']  # Default value is set here
     return [cycle_users[i % len(cycle_users)] for i in range(num_posts)]
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("num_posts", [3, 5, 10, 100])
-async def test_post_executor_users(num_posts):
-    user_names = generate_user_names(num_posts)
-    platforms = ['Instagram', 'Facebook', 'Instagram'] * (num_posts // 3) + ['Instagram', 'Facebook', 'Instagram'][
-                                                                            :num_posts % 3]
-    scheduled_times = [datetime.now() for _ in range(num_posts)]
-
-    posts_df = pd.DataFrame({
-        'Post ID': range(1, num_posts + 1),
-        'Platform': platforms,
-        'Content': [f'Check out our new product {i}' for i in range(1, num_posts + 1)],
-        'Image Path': ['img1'] * num_posts,
-        'Hashtags': ['#new #tech #insta'] * num_posts,
-        'Scheduled Time': scheduled_times,
-        'Status': ['Scheduled'] * num_posts,
-        'Remarks': [''] * num_posts,
-        'User Name': user_names
-    })
-
-    data_holder = DataHolder(posts_df, Path('post_executor_test.xlsx').name)
-    post_executor = PostExecutor(data_holder)
-    await post_executor.start()
-
-    # Additional assertions can be added here

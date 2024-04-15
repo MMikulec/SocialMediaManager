@@ -3,7 +3,7 @@ import pandas as pd
 
 
 @dataclass
-class SocialMediaPost:
+class MediaContent:
     """
     Represents a post to be shared on social media platforms.
 
@@ -19,12 +19,12 @@ class SocialMediaPost:
     hashtags: str
 
     @classmethod
-    def from_dataframe_row(cls, row: pd.Series) -> 'SocialMediaPost':
+    def from_dataframe_row(cls, row: pd.Series) -> 'MediaContent':
         """
-        Converts a row from a DataFrame into a SocialMediaPost object.
+        Converts a row from a DataFrame into a MediaContent object.
 
         :param row: A pandas Series object representing the data for a single post.
-        :return: A SocialMediaPost object populated with the data from the row.
+        :return: A MediaContent object populated with the data from the row.
         """
         return cls(
             post_id=row['Post ID'],
