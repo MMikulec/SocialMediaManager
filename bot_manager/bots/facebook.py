@@ -65,7 +65,7 @@ class FacebookBot(SocialMediaBot):
     async def post(self, post: FacebookPost) -> LogType:
 
         # Simulate the request operation
-        print(f"Posting {post}...")
+        logger.debug(f"Posting {post}...")
 
         # Simulated delay or network operation
         await asyncio.sleep(random.uniform(0.1, 0.3))

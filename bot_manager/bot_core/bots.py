@@ -3,6 +3,7 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from typing import Protocol, runtime_checkable
 
+from logger_config import logger, console
 from bot_manager.bot_core import LogType
 from bot_manager.bot_core.authenticator import PlatformAuthenticator
 from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger, LoggerSingleton
@@ -14,12 +15,13 @@ from bot_manager.bot_core.singleton import SingletonMeta, UserBasedSingletonMeta
 class SocialMediaProtocol(Protocol):
     """
     A protocol for social media bots. Implementing classes are expected to accept
-    an 'excel_file_name' parameter in their constructor for initializing with a specific Excel file.
+    an 'source_name' parameter in their constructor for initializing with a specific Excel file.
     """
 
-    def __init__(self, user_name: str, excel_file_name: str):
+    def __init__(self, user_name: str, source_name: str, credentials: dict):
         self.user_name = user_name
-        self.excel_file_name = excel_file_name
+        self.source_name = source_name
+        self.credentials = credentials
 
     def post(self, post: SocialMediaPost) -> LogType: ...
 
@@ -35,21 +37,26 @@ class SocialMediaBot(ABC, metaclass=UserBasedSingletonMeta):
         auth_manager (bot_manager.bot_core.authenticator.PlatformAuthenticator): Authentication manager instance for handling API authentication.
     """
 
-    # TODO: 5. 4. 2024: file_path(excel_file_name) to source
-    def __init__(self, user_name,  excel_file_name):
+    def __init__(self, user_name, source_name: str, credentials: dict):
         """
         Initializes the social media bot with a specific Excel file context.
 
-        Args:
-            excel_file_name (str): The name of the Excel file used for sourcing post data.
+        :param source_name: The name of the Excel file used for sourcing post data.
         """
-        """base_logger = setup_bot_logs(excel_file_name)
+        """base_logger = setup_bot_logs(source_name)
         self.logs = ContextualLogger(base_logger,
-                                     {'excel_file': excel_file_name, 'platform_name': self.platform_name})"""
+                                     {'excel_file': source_name, 'platform_name': self.platform_name})"""
         self.user_name = user_name
-        self.logs = LoggerSingleton.get_logger(excel_file_name, self.platform_name)
+        self.source_name = source_name
+        self.credentials = credentials
+        logger.debug(f"Initializing social media bot with "
+                     f"user_name: {self.user_name} "
+                     f"source_name: {self.source_name} "
+                     f"credentials: {self.credentials}")
+
+        self.logs = LoggerSingleton.get_logger(self.source_name, self.platform_name)
         self.auth_manager = self.create_auth_manager(api_key="your_api_key", api_secret="your_api_secret")
-        self.excel_file_name = excel_file_name
+
 
     @property
     @abstractmethod

@@ -105,13 +105,17 @@ class PostExecutor:
 
             # Load the bot for the specified platform and username
             bot = self.bot_manager.load_bot(row['User Name'], platform)
-            post = bot.create_post_from_dataframe_row(row)
-            # await bot.post(post)
 
-            try:
-                result = await bot.post(post)
-            except CredentialError:
-                pass
+            if bot is not None:
+                post = bot.create_post_from_dataframe_row(row)
+                # await bot.post(post)
+
+                try:
+                    result = await bot.post(post)
+                except CredentialError:
+                    pass
+            else:
+                logger.error(f'Bot {row["User Name"]}, {platform} not found. Post id: {row["Post ID"]}')
         finally:
             # Once execution is complete, mark it as not running
             self.running_tasks[row['Post ID']] = False

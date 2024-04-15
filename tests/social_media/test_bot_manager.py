@@ -1,6 +1,5 @@
 #  Copyright (c) 2024.
 import json
-from pathlib import Path
 import pandas as pd
 from social_media.bot_manager import BotManager  # Assuming BotManager is in this location
 from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Adjust if necessary
@@ -43,9 +42,9 @@ def test_bots_loading(tmp_path):
     bot_manager3 = BotManager(DataHolder(df, "plan_post3.xlsx", str(credentials_file)))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
-    bot_instance = bot_manager.load_bot("default", 'facebook')
-    bot_instance2 = bot_manager2.load_bot("default", 'facebook')
-    bot_instance3 = bot_manager3.load_bot("name", 'facebook')
+    bot_instance = bot_manager.load_bot("testuser1", 'facebook')
+    bot_instance2 = bot_manager2.load_bot("testuser1", 'facebook')
+    bot_instance3 = bot_manager3.load_bot("testuser2", 'facebook')
 
     assert bot_instance is bot_instance2
     assert bot_instance is not bot_instance3

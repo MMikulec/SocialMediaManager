@@ -1,20 +1,16 @@
-import asyncio
-import os
 import importlib
 from typing import Dict, Type, Optional, Tuple
 from pathlib import Path
 from bot_manager.bot_core.bots import SocialMediaProtocol, SocialMediaPost  # Import the protocol and post class
 from data_management.data_holder import DataHolder
-# from social_media.auth_manager import AuthManager
 from logger_config import logger, console
 from social_media.auth_manager.auth_manager import AuthManager
-from task_management import data_manager
 from social_media.auth_manager.auth_manager_base import AuthManagerProtocol
 
 
 class BotManager:
     # TODO: 5. 4. 2024: file_path to source
-    _bot_classes = {}  # Registry keyed by platform name
+    _bot_classes: Dict[str, Type[SocialMediaProtocol]] = {}  # Registry keyed by platform name
 
     def __init__(self, data_holder: DataHolder):
         self.data_holder = data_holder
@@ -75,11 +71,17 @@ class BotManager:
             logger.error(f"No bot class found for platform: {platform_name}")
             return None
 
+        # Use credentials to instantiate the bot correctly
+        user_credentials = self.auth_strategy.get_credentials(platform_name, user_name)
+        if not user_credentials:
+            logger.error(f"No credentials found for user {user_name} on platform {platform_name}")
+            return None
+
         # Adjusted to key instances by both platform and user
         key = (platform_name, user_name.lower())
         if key not in self.bot_instances:
             try:
-                bot_instance = bot_class(user_name, self.source)
+                bot_instance = bot_class(user_name, self.source, user_credentials)
                 self.bot_instances[key] = bot_instance
                 logger.debug(
                     f"Created new instance of {bot_class.__name__} for user {user_name} on platform {platform_name}.")
