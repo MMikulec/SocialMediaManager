@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from bot_manager.bot_core.singleton import SingletonMeta
+from bot_management.core.singleton import SingletonMeta
 
 
 class AbstractAuthenticator(ABC, metaclass=SingletonMeta):

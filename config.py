@@ -7,5 +7,5 @@ LOGGING_CONFIG = {
 
     # TODO: Marek: Setting for directories. Not working yet.
     "terminal_logs_directory": "",
-    "bots_logs_directory": 'bot_manager/logs'
+    "bots_logs_directory": 'bot_management/logs'
 }

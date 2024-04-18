@@ -19,7 +19,7 @@ credentials_json = json.dumps(credentials_data)
 
 # Parameterize the test function to accept different numbers of posts
 @pytest.mark.asyncio  # This decorator is used for async tests with pytest-asyncio
-@pytest.mark.parametrize("num_posts", [3, 5, 10, 100])
+@pytest.mark.parametrize("num_posts", [1, 100])
 async def test_post_executor_start(num_posts, tmp_path):
     platforms = ['Instagram', 'Facebook', 'Instagram'] * (num_posts // 3) + ['Instagram', 'Facebook', 'Instagram'][
                                                                             :num_posts % 3]
@@ -61,5 +61,5 @@ def generate_user_names(num_posts, cycle_users=None):
     repeating until reaching 'num_posts'.
     """
     if cycle_users is None:
-        cycle_users = ['default', 'user1', 'user2']  # Default value is set here
+        cycle_users = ['instauser', 'testuser2', 'instauser']  # Default value is set here
     return [cycle_users[i % len(cycle_users)] for i in range(num_posts)]

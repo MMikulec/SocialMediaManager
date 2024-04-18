@@ -2,7 +2,7 @@
 import json
 import pandas as pd
 from social_media.bot_manager import BotManager  # Assuming BotManager is in this location
-from bot_manager.bot_core.bots import BotProtocol, MediaContent  # Adjust if necessary
+from bot_management.core.bots_base import BotProtocol, MediaContent  # Adjust if necessary
 from data_management.data_holder import DataHolder
 from datetime import datetime, timedelta
 

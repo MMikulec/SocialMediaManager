@@ -5,7 +5,7 @@ from task_management.scheduling.async_task_scheduler import AsyncTaskScheduler
 from data_management.data_holder import DataHolder
 from social_media.bot_manager import BotManager
 from logger_config import logger, console
-from bot_manager.bot_core.errors import CredentialError
+from bot_management.core.errors import CredentialError
 
 
 class PostExecutor:

@@ -1,7 +1,7 @@
 import importlib
 from typing import Dict, Type, Optional, Tuple
 from pathlib import Path
-from bot_manager.bot_core.bots import BotProtocol, MediaContent  # Import the protocol and post class
+from bot_management.core.bots_base import BotProtocol, MediaContent  # Import the protocol and post class
 from data_management.data_holder import DataHolder
 from logger_config import logger, console
 from social_media.auth_manager.auth_manager import AuthManager
@@ -51,12 +51,12 @@ class BotManager:
 
     def load_platform_post_classes(self) -> Dict[str, Type[BotProtocol]]:
         platform_classes = {}
-        # Assuming your bots.py file is in the correct location relative to this file
-        bots_dir = Path(__file__).parent.parent / 'bot_manager' / 'bots'
+        # Assuming your bots_base.py file is in the correct location relative to this file
+        bots_dir = Path(__file__).parent.parent / 'bot_management' / 'bots'
         for file in bots_dir.iterdir():
             if file.is_file() and file.suffix == '.py' and file.name != '__init__.py':
                 module_name = file.stem  # Extracts the file name without '.py'
-                module = importlib.import_module(f'bot_manager.bots.{module_name}')
+                module = importlib.import_module(f'bot_management.bots.{module_name}')
                 class_name = module_name.capitalize() + 'Bot'  # Construct the class name based on file name
                 bot_class = getattr(module, class_name, None)
                 if bot_class and issubclass(bot_class, BotProtocol):

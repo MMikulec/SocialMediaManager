@@ -4,12 +4,12 @@ import random
 import pandas as pd
 from typing import Tuple, Optional, Any, TypeAlias
 
-from bot_manager.bot_core.logging_utils import setup_bot_logs, ContextualLogger
-from bot_manager.bot_core.media import MediaContent
-from bot_manager.bot_core.bots import AbstractBot
-from bot_manager.bot_core.utils import auto_log
-from bot_manager.bot_core.authenticator import AbstractAuthenticator
-from bot_manager.bot_core import LogType
+from bot_management.core.logging_utils import setup_bot_logs, ContextualLogger
+from bot_management.core.media import MediaContent
+from bot_management.core.bots_base import AbstractBot
+from bot_management.core.utils import auto_log
+from bot_management.core.authenticator import AbstractAuthenticator
+from bot_management.core import LogType
 from logger_config import logger, console
 from dataclasses import dataclass, asdict
 

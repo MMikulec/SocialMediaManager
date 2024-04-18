@@ -10,7 +10,7 @@ from logger_config import logger
 
 def setup_bot_logs(source_name):
     """Set up a logs for a specific source file."""
-    logs_dir = 'bot_manager/logs'
+    logs_dir = 'bot_management/logs'
     source_base_name = os.path.splitext(os.path.basename(source_name))[0]
     log_file = f'{logs_dir}/{source_base_name}_posts.log'
 
