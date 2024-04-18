@@ -3,7 +3,8 @@ import time
 from pathlib import Path
 from logger_config import logger, console
 
-from task_management import ExcelDataManager, LogDataManager, TaskScheduler, display_dataframe_as_table
+from data_management.data_handlers import ExcelDataManager, LogDataManager
+from task_management import TaskScheduler, display_dataframe_as_table
 from data_management.data_holder import DataHolder
 from social_media import PostExecutor
 

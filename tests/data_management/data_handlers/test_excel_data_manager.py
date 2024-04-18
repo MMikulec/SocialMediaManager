@@ -5,7 +5,7 @@ from pandas.testing import assert_frame_equal
 
 import pytest
 # Adjust the import according to your project structure
-from task_management.data_manager.excel_data_manager import ExcelDataManager
+from data_management.data_handlers.excel_handler import ExcelDataManager
 
 
 # Create a fixture for the ExcelDataManager

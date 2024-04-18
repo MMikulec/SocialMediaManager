@@ -1,8 +1,6 @@
 import pytest
-from pathlib import Path
 import pandas as pd
-from datetime import datetime, timedelta
-from task_management.data_manager.log_data_manager import LogDataManager  # Adjust the import path according to your project structure
+from data_management.data_handlers.log_handler import LogDataManager  # Adjust the import path according to your project structure
 
 
 @pytest.fixture
