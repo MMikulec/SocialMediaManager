@@ -1,6 +1,6 @@
 import json
-from social_media.auth_manager.auth_manager import AuthManager
-from social_media.auth_manager.auth_manager_base import AuthManagerProtocol
+from data_management.auth_manager.auth_manager import AuthManager
+from data_management.auth_manager.auth_manager_base import AuthManagerProtocol
 
 CREDENTIALS_FILE = r"social_media/auth_manager/test_credentials.json"
 

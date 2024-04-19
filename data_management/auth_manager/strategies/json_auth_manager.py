@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Optional, Dict, List
 import json
 
-from social_media.auth_manager.auth_manager_base import AbstractAuthManager
-from social_media.auth_manager.auth_manager import AuthManager
+from data_management.auth_manager.auth_manager_base import AbstractAuthManager
+from data_management.auth_manager.auth_manager import AuthManager
 
 
 @AuthManager.register_auth_strategy('json')

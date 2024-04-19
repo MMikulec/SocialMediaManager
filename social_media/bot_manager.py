@@ -1,11 +1,11 @@
 import importlib
 from typing import Dict, Type, Optional, Tuple
 from pathlib import Path
-from bot_management.core.bots_base import BotProtocol, MediaContent  # Import the protocol and post class
+from bot_management.core.bots_base import BotProtocol  # Import the protocol and post class
 from data_management.data_holder import DataHolder
-from logger_config import logger, console
-from social_media.auth_manager.auth_manager import AuthManager
-from social_media.auth_manager.auth_manager_base import AuthManagerProtocol
+from logger_config import logger
+from data_management.auth_manager.auth_manager import AuthManager
+from data_management.auth_manager.auth_manager_base import AuthManagerProtocol
 
 
 class BotManager:

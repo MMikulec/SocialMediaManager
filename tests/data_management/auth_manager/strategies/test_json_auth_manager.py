@@ -1,8 +1,6 @@
 import json
-import pytest
-from pathlib import Path
 
-from social_media.auth_manager.strategies.json_auth_manager import JSONAuthManager
+from data_management.auth_manager.strategies.json_auth_manager import JSONAuthManager
 
 # Sample data for use in tests
 credentials_data = {

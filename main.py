@@ -11,7 +11,7 @@ from social_media import PostExecutor
 
 def main():
     excel_file_path = Path("plan.xlsx")
-    log_file_path = Path(f'bot_manager/logs/{excel_file_path.stem}_posts.log')
+    log_file_path = Path(f'bot_management/logs/{excel_file_path.stem}_posts.log')
     credential_source = Path('plan.json').name
 
     excel_manager = ExcelDataManager(excel_file_path)

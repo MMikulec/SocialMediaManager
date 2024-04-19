@@ -1,7 +1,7 @@
 # social_media/auth_manager/auth_manager.py
 import importlib
 from pathlib import Path
-from social_media.auth_manager.auth_manager_base import AbstractAuthManager
+from data_management.auth_manager.auth_manager_base import AbstractAuthManager
 
 
 class AuthManager:
@@ -25,7 +25,7 @@ class AuthManager:
         strategies_dir = Path(__file__).parent / 'strategies'
         for file in strategies_dir.glob('*.py'):
             if file.name not in ["__init__.py"]:
-                module_path = f"social_media.auth_manager.strategies.{file.stem}"
+                module_path = f"data_management.auth_manager.strategies.{file.stem}"
                 importlib.import_module(module_path)
         # No need to manually fill _auth_strategies here, as strategies register themselves via decorator
 
