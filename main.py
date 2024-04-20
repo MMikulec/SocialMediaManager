@@ -4,9 +4,9 @@ from pathlib import Path
 from logger_config import logger, console
 
 from data_management.data_handlers import ExcelDataManager, LogDataManager
-from task_management import TaskScheduler, display_dataframe_as_table
+from task_management import TaskScheduler
 from data_management.data_holder import DataHolder
-from social_media import PostExecutor
+from services import PostExecutor
 
 
 def main():

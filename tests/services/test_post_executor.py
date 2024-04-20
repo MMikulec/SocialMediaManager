@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import asyncio
 from pathlib import Path
-from social_media.post_executor import PostExecutor
+from services.post_executor import PostExecutor
 from data_management.data_holder import DataHolder
 
 # Sample data for use in tests

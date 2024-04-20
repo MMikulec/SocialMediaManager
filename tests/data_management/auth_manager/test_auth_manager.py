@@ -2,7 +2,7 @@ import json
 from data_management.auth_manager.auth_manager import AuthManager
 from data_management.auth_manager.auth_manager_base import AuthManagerProtocol
 
-CREDENTIALS_FILE = r"social_media/auth_manager/test_credentials.json"
+CREDENTIALS_FILE = r"data_management/auth_manager/test_credentials.json"
 
 # Sample data for use in tests
 credentials_data = {

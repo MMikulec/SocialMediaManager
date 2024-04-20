@@ -3,3 +3,4 @@
 **/__pycache__/
 **/.pytest_cache!/tests/bot_management/logs/
 !/tests/bot_management/logs/
+!/1_excluded/

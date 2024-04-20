@@ -13,7 +13,7 @@ from bot_management.core import LogType
 from logger_config import logger, console
 from dataclasses import dataclass, asdict
 
-from social_media.bot_manager import BotManager
+from services.bot_manager import BotManager
 
 import threading
 import time

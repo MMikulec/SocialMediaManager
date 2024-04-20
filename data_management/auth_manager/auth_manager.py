@@ -1,4 +1,3 @@
-# social_media/auth_manager/auth_manager.py
 import importlib
 from pathlib import Path
 from data_management.auth_manager.auth_manager_base import AbstractAuthManager

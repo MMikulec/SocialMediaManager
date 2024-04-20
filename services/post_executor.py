@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 from task_management.scheduling.async_task_scheduler import AsyncTaskScheduler
 from data_management.data_holder import DataHolder
-from social_media.bot_manager import BotManager
+from services.bot_manager import BotManager
 from logger_config import logger, console
 from bot_management.core.errors import CredentialError
 
