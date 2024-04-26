@@ -13,7 +13,7 @@ from bot_management.core import LogType
 from logger_config import logger, console
 from dataclasses import dataclass, asdict
 
-from services.bot_manager import BotManager
+# from services.bot_manager import BotManager
 
 import threading
 import time
@@ -50,7 +50,7 @@ class AuthenticatorInstagram(AbstractAuthenticator):
         self.token = "new_Instagram_token"
 
 
-@BotManager.register_bot(platform_name='instagram')
+# @BotManager.register_bot(platform_name='instagram')
 class InstagramBot(AbstractBot):
     platform_name = property(lambda self: "Instagram")
 

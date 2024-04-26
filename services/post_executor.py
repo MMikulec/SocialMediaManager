@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 from task_management.scheduling.async_task_scheduler import AsyncTaskScheduler
 from data_management.data_holder import DataHolder
-from services.bot_manager import BotManager
+from services.bot_service import BotService
 from logger_config import logger, console
 from bot_management.core.errors import CredentialError
 
@@ -18,7 +18,7 @@ class PostExecutor:
         :param file_path: The path to the Excel file used for bot management.
         :param data_holder: The container holding the DataFrame of posts.
         """
-        self.bot_manager = BotManager(data_holder)
+        self.bot_manager = BotService(data_holder)
         self.task_scheduler = AsyncTaskScheduler()
 
         self.data_holder = data_holder
@@ -34,7 +34,7 @@ class PostExecutor:
         :param new_file_name: The new name of the Excel file to use for bot management.
         :param  new_data_holder: The new DataHolder containing the updated DataFrame.
         """
-        self.bot_manager = BotManager(new_data_holder)
+        self.bot_manager = BotService(new_data_holder)
         self.task_scheduler = AsyncTaskScheduler()
 
         self.data_holder = new_data_holder

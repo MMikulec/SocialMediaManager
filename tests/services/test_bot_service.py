@@ -1,7 +1,7 @@
 #  Copyright (c) 2024.
 import json
 import pandas as pd
-from services.bot_manager import BotManager  # Assuming BotManager is in this location
+from services.bot_service import BotService  # Assuming BotManager is in this location
 from bot_management.core.bots_base import BotProtocol, MediaContent  # Adjust if necessary
 from data_management.data_holder import DataHolder
 from datetime import datetime, timedelta
@@ -37,9 +37,9 @@ def test_bots_loading(tmp_path):
     credentials_file = tmp_path / "credentials.json"
     credentials_file.write_text(credentials_json)
 
-    bot_manager = BotManager(DataHolder(df, "plan_post.xlsx", str(credentials_file)))
-    bot_manager2 = BotManager(DataHolder(df, "plan_post2.xlsx", str(credentials_file)))
-    bot_manager3 = BotManager(DataHolder(df, "plan_post3.xlsx", str(credentials_file)))
+    bot_manager = BotService(DataHolder(df, "plan_post.xlsx", str(credentials_file)))
+    bot_manager2 = BotService(DataHolder(df, "plan_post2.xlsx", str(credentials_file)))
+    bot_manager3 = BotService(DataHolder(df, "plan_post3.xlsx", str(credentials_file)))
 
     # Attempt to load a bot for a specific platform, adjust 'facebook' as necessary
     bot_instance = bot_manager.load_bot("testuser1", 'facebook')

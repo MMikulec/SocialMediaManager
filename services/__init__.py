@@ -1,2 +1,2 @@
-from .bot_manager import BotManager
+from services.bot_service import BotService
 from .post_executor import PostExecutor
